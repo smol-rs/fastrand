@@ -1,0 +1,13 @@
+[package]
+name = "fastrand"
+version = "1.0.0"
+authors = ["Stjepan Glavina <stjepang@gmail.com>"]
+edition = "2018"
+description = "A simple random number generator"
+license = "Apache-2.0 OR MIT"
+repository = "https://github.com/stjepang/fastrand"
+homepage = "https://github.com/stjepang/fastrand"
+documentation = "https://docs.rs/fastrand"
+keywords = ["easy", "simple", "rand", "random", "xorshift"]
+Categories = ["algorithms"]
+readme = "README.md"
