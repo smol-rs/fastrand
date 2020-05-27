@@ -17,7 +17,7 @@ Easy to use but not cryptographically secure.
 
 Flip a coin:
 
-```
+```rust
 if fastrand::bool() {
     println!("heads");
 } else {
@@ -27,13 +27,13 @@ if fastrand::bool() {
 
 Generate a random `i32`:
 
-```
+```rust
 let num = fastrand::i32(..);
 ```
 
 Choose a random element in an array:
 
-```
+```rust
 let v = vec![1, 2, 3, 4, 5];
 let i = fastrand::usize(..v.len());
 let elem = v[i];
@@ -41,7 +41,7 @@ let elem = v[i];
 
 Shuffle an array:
 
-```
+```rust
 let mut v = vec![1, 2, 3, 4, 5];
 fastrand::shuffle(&mut v);
 ```
