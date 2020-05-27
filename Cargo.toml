@@ -9,5 +9,5 @@ repository = "https://github.com/stjepang/fastrand"
 homepage = "https://github.com/stjepang/fastrand"
 documentation = "https://docs.rs/fastrand"
 keywords = ["easy", "simple", "rand", "random", "xorshift"]
-Categories = ["algorithms"]
+categories = ["algorithms"]
 readme = "README.md"

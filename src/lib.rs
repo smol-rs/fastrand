@@ -35,6 +35,8 @@
 //! fastrand::shuffle(&mut v);
 //! ```
 
+#![warn(missing_docs, missing_debug_implementations, rust_2018_idioms)]
+
 use std::cell::Cell;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
