@@ -11,7 +11,10 @@ https://docs.rs/fastrand)
 
 A simple random number generator.
 
-Easy to use but not cryptographically secure.
+The implementation uses [PCG XSH RS 64/32][paper], a simple and fast generator but not
+cryptographically secure.
+
+[paper]: https://www.pcg-random.org/pdf/hmc-cs-2014-0905.pdf
 
 ## Examples
 
@@ -44,6 +47,25 @@ Shuffle an array:
 ```rust
 let mut v = vec![1, 2, 3, 4, 5];
 fastrand::shuffle(&mut v);
+```
+
+Generate a random `Vec` or `String`:
+
+```rust
+use std::iter::repeat_with;
+
+let v: Vec<i32> = repeat_with(|| fastrand::i32(..)).take(10).collect();
+let s: String = repeat_with(fastrand::alphanumeric).take(10).collect();
+```
+
+To get reproducible results on every run, initialize the generator with a seed:
+
+```rust
+// Pick an arbitrary number as seed.
+fastrand::seed(7);
+
+// Now this prints the same number on every run:
+println!("{}", fastrand::u32(..));
 ```
 
 ## License

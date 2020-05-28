@@ -1,6 +1,9 @@
 //! A simple random number generator.
 //!
-//! Easy to use but not cryptographically secure.
+//! The implementation uses [PCG XSH RS 64/32][paper], a simple and fast generator but not
+//! cryptographically secure.
+//!
+//! [paper]: https://www.pcg-random.org/pdf/hmc-cs-2014-0905.pdf
 //!
 //! # Examples
 //!
@@ -34,6 +37,25 @@
 //! let mut v = vec![1, 2, 3, 4, 5];
 //! fastrand::shuffle(&mut v);
 //! ```
+//!
+//! Generate a random [`Vec`] or [`String`]:
+//!
+//! ```
+//! use std::iter::repeat_with;
+//!
+//! let v: Vec<i32> = repeat_with(|| fastrand::i32(..)).take(10).collect();
+//! let s: String = repeat_with(fastrand::alphanumeric).take(10).collect();
+//! ```
+//!
+//! To get reproducible results on every run, initialize the generator with a seed:
+//!
+//! ```
+//! // Pick an arbitrary number as seed.
+//! fastrand::seed(7);
+//!
+//! // Now this prints the same number on every run:
+//! println!("{}", fastrand::u32(..));
+//! ```
 
 #![warn(missing_docs, missing_debug_implementations, rust_2018_idioms)]
 
@@ -44,33 +66,39 @@ use std::ops::{Bound, RangeBounds};
 use std::thread;
 use std::time::Instant;
 
+thread_local! {
+    static STATE: Cell<u64> = {
+        let mut hasher = DefaultHasher::new();
+        Instant::now().hash(&mut hasher);
+        thread::current().id().hash(&mut hasher);
+        let hash = hasher.finish();
+        Cell::new((hash << 1) | 1)
+    }
+}
+
+/// Initializes thread-local generator with the given seed.
+pub fn seed(seed: u64) {
+    STATE.with(|state| state.set((seed << 1) | 1));
+    gen_u32();
+}
+
+/// Generates a random `u32`.
+fn gen_u32() -> u32 {
+    // Adapted from: https://en.wikipedia.org/wiki/Permuted_congruential_generator
+    STATE
+        .try_with(|state| {
+            let s = state.get();
+            state.set(s.wrapping_mul(6364136223846793005));
+            let count = s >> 61;
+            let x = s ^ (s >> 22);
+            (x >> (22 + count)) as u32
+        })
+        .unwrap_or(1157102669)
+}
+
 /// Generates a random `u64`.
 fn gen_u64() -> u64 {
-    thread_local! {
-        static RNG: Cell<(u64, u64)> = Cell::new((seed(), seed()));
-    }
-
-    #[cold]
-    fn seed() -> u64 {
-        let mut hasher = DefaultHasher::new();
-        thread::current().id().hash(&mut hasher);
-        Instant::now().hash(&mut hasher);
-        hasher.finish()
-    }
-
-    // xorshift+: https://en.wikipedia.org/wiki/Xorshift
-    RNG.try_with(|rng| {
-        let (mut a, mut b) = rng.get();
-        let (mut t, s) = (a, b);
-        a = s;
-        t ^= t << 23;
-        t ^= t >> 17;
-        t ^= s ^ (s >> 26);
-        b = t;
-        rng.set((a, b));
-        t.wrapping_add(s)
-    })
-    .unwrap_or_else(|_| seed())
+    ((gen_u32() as u64) << 32) | (gen_u32() as u64)
 }
 
 /// Generates a random `u128`.
@@ -116,34 +144,34 @@ fn gen_mod_u128(n: u128) -> u128 {
     mul_high_u128(gen_u128(), n)
 }
 
-macro_rules! code {
+macro_rules! integer {
     ($t:tt, $gen:expr, $mod:ident, $doc:tt) => {
         #[doc = $doc]
         ///
         /// Panics if the range is empty.
         pub fn $t(range: impl RangeBounds<$t>) -> $t {
+            let panic_empty_range = || {
+                panic!(
+                    "empty range: {:?}..{:?}",
+                    range.start_bound(),
+                    range.end_bound()
+                )
+            };
+
             let low = match range.start_bound() {
                 Bound::Unbounded => $t::MIN,
                 Bound::Included(&x) => x,
-                Bound::Excluded(&x) => x
-                    .checked_add(1)
-                    .unwrap_or_else(|| panic!("invalid start bound: {:?}", range.start_bound())),
+                Bound::Excluded(&x) => x.checked_add(1).unwrap_or_else(panic_empty_range),
             };
 
             let high = match range.end_bound() {
                 Bound::Unbounded => $t::MAX,
                 Bound::Included(&x) => x,
-                Bound::Excluded(&x) => x
-                    .checked_sub(1)
-                    .unwrap_or_else(|| panic!("invalid end bound: {:?}", range.end_bound())),
+                Bound::Excluded(&x) => x.checked_sub(1).unwrap_or_else(panic_empty_range),
             };
 
             if low > high {
-                panic!(
-                    "empty range: {:?}..{:?}",
-                    range.start_bound(),
-                    range.end_bound()
-                );
+                panic_empty_range();
             }
 
             if low == $t::MIN && high == $t::MAX {
@@ -156,92 +184,140 @@ macro_rules! code {
     };
 }
 
-code!(
+integer!(
     u8,
-    gen_u64,
+    gen_u32,
     gen_mod_u32,
     "Generates a random `u8` in the given range."
 );
-code!(
+
+integer!(
     i8,
-    gen_u64,
+    gen_u32,
     gen_mod_u32,
     "Generates a random `i8` in the given range."
 );
 
-code!(
+integer!(
     u16,
-    gen_u64,
+    gen_u32,
     gen_mod_u32,
     "Generates a random `u16` in the given range."
 );
-code!(
+
+integer!(
     i16,
-    gen_u64,
+    gen_u32,
     gen_mod_u32,
     "Generates a random `i16` in the given range."
 );
 
-code!(
+integer!(
     u32,
-    gen_u64,
+    gen_u32,
     gen_mod_u32,
     "Generates a random `u32` in the given range."
 );
-code!(
+
+integer!(
     i32,
-    gen_u64,
+    gen_u32,
     gen_mod_u32,
     "Generates a random `i32` in the given range."
 );
 
-code!(
+integer!(
     u64,
     gen_u64,
     gen_mod_u64,
     "Generates a random `u64` in the given range."
 );
-code!(
+
+integer!(
     i64,
     gen_u64,
     gen_mod_u64,
     "Generates a random `i64` in the given range."
 );
 
-code!(
-    usize,
-    gen_u64,
-    gen_mod_u64,
-    "Generates a random `usize` in the given range."
-);
-code!(
-    isize,
-    gen_u64,
-    gen_mod_u64,
-    "Generates a random `isize` in the given range."
-);
-
-code!(
+integer!(
     u128,
     gen_u128,
     gen_mod_u128,
     "Generates a random `u128` in the given range."
 );
-code!(
+
+integer!(
     i128,
     gen_u128,
     gen_mod_u128,
     "Generates a random `i128` in the given range."
 );
 
+#[cfg(target_pointer_width = "16")]
+integer!(
+    usize,
+    gen_u32,
+    gen_mod_u32,
+    "Generates a random `usize` in the given range."
+);
+
+#[cfg(target_pointer_width = "16")]
+integer!(
+    isize,
+    gen_u32,
+    gen_mod_u32,
+    "Generates a random `isize` in the given range."
+);
+
+#[cfg(target_pointer_width = "32")]
+integer!(
+    usize,
+    gen_u32,
+    gen_mod_u32,
+    "Generates a random `usize` in the given range."
+);
+
+#[cfg(target_pointer_width = "32")]
+integer!(
+    isize,
+    gen_u32,
+    gen_mod_u32,
+    "Generates a random `isize` in the given range."
+);
+
+#[cfg(target_pointer_width = "64")]
+integer!(
+    usize,
+    gen_u64,
+    gen_mod_u64,
+    "Generates a random `usize` in the given range."
+);
+
+#[cfg(target_pointer_width = "64")]
+integer!(
+    isize,
+    gen_u64,
+    gen_mod_u64,
+    "Generates a random `isize` in the given range."
+);
+
 /// Generates a random `bool`.
 pub fn bool() -> bool {
-    self::u8(..) % 2 == 0
+    crate::u8(..) % 2 == 0
+}
+
+/// Generates a random `char` in ranges a-z, A-Z and 0-9.
+pub fn alphanumeric() -> char {
+    const CHARS: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let len = CHARS.len() as u8;
+    let i = crate::u8(..len);
+    CHARS[i as usize] as char
 }
 
 /// Shuffles a slice randomly.
 pub fn shuffle<T>(slice: &mut [T]) {
     for i in 1..slice.len() {
-        slice.swap(i, self::usize(..=i));
+        slice.swap(i, crate::usize(..=i));
     }
 }
