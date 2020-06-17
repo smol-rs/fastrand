@@ -68,6 +68,16 @@ fastrand::seed(7);
 println!("{}", fastrand::u32(..));
 ```
 
+To be more efficient, create a new `Rng` instance instead of using the thread-local
+generator:
+
+```rust
+use std::iter::repeat_with;
+
+let rng = fastrand::Rng::new();
+let mut bytes: Vec<u8> = repeat_with(|| rng.u8(..)).take(10_000).collect();
+```
+
 ## License
 
 Licensed under either of
