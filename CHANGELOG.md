@@ -1,3 +1,7 @@
+# Version 1.2.3
+
+- Support Rust 1.32.0
+
 # Version 1.2.2
 
 - Use `std::$t::MAX` rather than `$t::MAX` to support older Rust versions.
