@@ -26,3 +26,27 @@ fn i8() {
         while fastrand::i8(120..) != x {}
     }
 }
+
+#[test]
+fn rng() {
+    let r = fastrand::Rng::new();
+
+    assert_ne!(r.u64(..), r.u64(..));
+
+    r.seed(7);
+    let a = r.u64(..);
+    r.seed(7);
+    let b = r.u64(..);
+    assert_eq!(a, b);
+}
+
+#[test]
+fn rng_init() {
+    let a = fastrand::Rng::new();
+    let b = fastrand::Rng::new();
+    assert_ne!(a.u64(..), b.u64(..));
+
+    a.seed(7);
+    b.seed(7);
+    assert_eq!(a.u64(..), b.u64(..));
+}
