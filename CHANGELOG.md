@@ -1,3 +1,7 @@
+# Version 1.2.1
+
+- Inline all functions.
+
 # Version 1.2.0
 
 - Add `Rng` struct.
