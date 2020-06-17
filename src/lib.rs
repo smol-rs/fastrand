@@ -81,6 +81,7 @@ use std::time::Instant;
 pub struct Rng(Cell<u64>);
 
 impl Default for Rng {
+    #[inline]
     fn default() -> Rng {
         Rng::new()
     }
@@ -88,6 +89,7 @@ impl Default for Rng {
 
 impl Rng {
     /// Generates a random `u32`.
+    #[inline]
     fn gen_u32(&self) -> u32 {
         // Adapted from: https://en.wikipedia.org/wiki/Permuted_congruential_generator
         let s = self.0.get();
@@ -98,26 +100,31 @@ impl Rng {
     }
 
     /// Generates a random `u64`.
+    #[inline]
     fn gen_u64(&self) -> u64 {
         ((self.gen_u32() as u64) << 32) | (self.gen_u32() as u64)
     }
 
     /// Generates a random `u128`.
+    #[inline]
     fn gen_u128(&self) -> u128 {
         ((self.gen_u64() as u128) << 64) | (self.gen_u64() as u128)
     }
 
     /// Generates a random `u32` in `0..n`.
+    #[inline]
     fn gen_mod_u32(&self, n: u32) -> u32 {
         mul_high_u32(self.gen_u64() as u32, n)
     }
 
     /// Generates a random `u64` in `0..n`.
+    #[inline]
     fn gen_mod_u64(&self, n: u64) -> u64 {
         mul_high_u64(self.gen_u64(), n)
     }
 
     /// Generates a random `u128` in `0..n`.
+    #[inline]
     fn gen_mod_u128(&self, n: u128) -> u128 {
         mul_high_u128(self.gen_u128(), n)
     }
@@ -134,16 +141,19 @@ thread_local! {
 }
 
 /// Computes `(a * b) >> 32`.
+#[inline]
 fn mul_high_u32(a: u32, b: u32) -> u32 {
     (((a as u64) * (b as u64)) >> 32) as u32
 }
 
 /// Computes `(a * b) >> 64`.
+#[inline]
 fn mul_high_u64(a: u64, b: u64) -> u64 {
     (((a as u128) * (b as u128)) >> 64) as u64
 }
 
 /// Computes `(a * b) >> 128`.
+#[inline]
 fn mul_high_u128(a: u128, b: u128) -> u128 {
     let a_lo = a as u64 as u128;
     let a_hi = (a >> 64) as u64 as u128;
@@ -161,6 +171,7 @@ macro_rules! rng_integer {
         #[doc = $doc]
         ///
         /// Panics if the range is empty.
+        #[inline]
         pub fn $t(&self, range: impl RangeBounds<$t>) -> $t {
             let panic_empty_range = || {
                 panic!(
@@ -198,6 +209,7 @@ macro_rules! rng_integer {
 
 impl Rng {
     /// Creates a new random number generator.
+    #[inline]
     pub fn new() -> Rng {
         let rng = Rng(Cell::new(0));
         rng.seed(RNG.try_with(|rng| rng.u64(..)).unwrap_or(1157102669));
@@ -205,6 +217,7 @@ impl Rng {
     }
 
     /// Generates a random `char` in ranges a-z, A-Z and 0-9.
+    #[inline]
     pub fn alphanumeric(&self) -> char {
         const CHARS: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         let len = CHARS.len() as u8;
@@ -213,6 +226,7 @@ impl Rng {
     }
 
     /// Generates a random `bool`.
+    #[inline]
     pub fn bool(&self) -> bool {
         self.u8(..) % 2 == 0
     }
@@ -275,12 +289,14 @@ impl Rng {
     );
 
     /// Initializes this generator with the given seed.
+    #[inline]
     pub fn seed(&self, seed: u64) {
         self.0.set((seed << 1) | 1);
         self.gen_u32();
     }
 
     /// Shuffles a slice randomly.
+    #[inline]
     pub fn shuffle<T>(&self, slice: &mut [T]) {
         for i in 1..slice.len() {
             slice.swap(i, self.usize(..=i));
@@ -346,21 +362,25 @@ impl Rng {
 }
 
 /// Initializes the thread-local generator with the given seed.
+#[inline]
 pub fn seed(seed: u64) {
     RNG.with(|rng| rng.seed(seed))
 }
 
 /// Generates a random `bool`.
+#[inline]
 pub fn bool() -> bool {
     RNG.with(|rng| rng.bool())
 }
 
 /// Generates a random `char` in ranges a-z, A-Z and 0-9.
+#[inline]
 pub fn alphanumeric() -> char {
     RNG.with(|rng| rng.alphanumeric())
 }
 
 /// Shuffles a slice randomly.
+#[inline]
 pub fn shuffle<T>(slice: &mut [T]) {
     RNG.with(|rng| rng.shuffle(slice))
 }
@@ -370,6 +390,7 @@ macro_rules! integer {
         #[doc = $doc]
         ///
         /// Panics if the range is empty.
+        #[inline]
         pub fn $t(range: impl RangeBounds<$t>) -> $t {
             RNG.with(|rng| rng.$t(range))
         }
