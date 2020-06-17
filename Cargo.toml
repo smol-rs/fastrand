@@ -11,3 +11,7 @@ documentation = "https://docs.rs/fastrand"
 keywords = ["easy", "simple", "rand", "random", "xorshift"]
 categories = ["algorithms"]
 readme = "README.md"
+
+[dev-dependencies]
+rand = "0.7.3"
+rand_pcg = "0.2.1"
