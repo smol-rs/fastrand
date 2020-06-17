@@ -188,7 +188,7 @@ macro_rules! rng_integer {
             };
 
             let high = match range.end_bound() {
-                Bound::Unbounded => $t::MAX,
+                Bound::Unbounded => std::$t::MAX,
                 Bound::Included(&x) => x,
                 Bound::Excluded(&x) => x.checked_sub(1).unwrap_or_else(panic_empty_range),
             };
@@ -197,7 +197,7 @@ macro_rules! rng_integer {
                 panic_empty_range();
             }
 
-            if low == $t::MIN && high == $t::MAX {
+            if low == $t::MIN && high == std::$t::MAX {
                 self.$gen() as $t
             } else {
                 let len = high.wrapping_sub(low).wrapping_add(1);
