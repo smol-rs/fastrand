@@ -1,3 +1,7 @@
+# Version 1.2.0
+
+- Add `Rng` struct.
+
 # Version 1.1.0
 
 - Switch to PCG implementation.
