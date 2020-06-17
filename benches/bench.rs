@@ -3,12 +3,12 @@
 extern crate test;
 
 use rand::prelude::*;
-use rand_pcg::Pcg32 as SmallRng;
+use rand_pcg::Pcg32;
 use test::Bencher;
 
 #[bench]
-fn rand_smallrng(b: &mut Bencher) {
-    let mut rng = SmallRng::from_rng(thread_rng()).unwrap();
+fn shuffle_rand_pcg32(b: &mut Bencher) {
+    let mut rng = Pcg32::from_rng(thread_rng()).unwrap();
     let x: &mut [usize] = &mut [1; 100];
     b.iter(|| {
         x.shuffle(&mut rng);
@@ -17,11 +17,59 @@ fn rand_smallrng(b: &mut Bencher) {
 }
 
 #[bench]
-fn fastrand_rng(b: &mut Bencher) {
+fn shuffle_fastrand(b: &mut Bencher) {
     let rng = fastrand::Rng::new();
     let x: &mut [usize] = &mut [1; 100];
     b.iter(|| {
         rng.shuffle(x);
         x[0]
+    })
+}
+
+#[bench]
+fn u8_rand_pcg32(b: &mut Bencher) {
+    let mut rng = Pcg32::from_rng(thread_rng()).unwrap();
+    b.iter(|| {
+        let mut sum = 0u8;
+        for _ in 0..10_000 {
+            sum = sum.wrapping_add(rng.gen::<u8>());
+        }
+        sum
+    })
+}
+
+#[bench]
+fn u8_fastrand(b: &mut Bencher) {
+    let rng = fastrand::Rng::new();
+    b.iter(|| {
+        let mut sum = 0u8;
+        for _ in 0..10_000 {
+            sum = sum.wrapping_add(rng.u8(..));
+        }
+        sum
+    })
+}
+
+#[bench]
+fn u32_rand_pcg32(b: &mut Bencher) {
+    let mut rng = Pcg32::from_rng(thread_rng()).unwrap();
+    b.iter(|| {
+        let mut sum = 0u32;
+        for _ in 0..10_000 {
+            sum = sum.wrapping_add(rng.gen::<u32>());
+        }
+        sum
+    })
+}
+
+#[bench]
+fn u32_fastrand(b: &mut Bencher) {
+    let rng = fastrand::Rng::new();
+    b.iter(|| {
+        let mut sum = 0u32;
+        for _ in 0..10_000 {
+            sum = sum.wrapping_add(rng.u32(..));
+        }
+        sum
     })
 }
