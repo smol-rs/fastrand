@@ -9,7 +9,7 @@ use test::Bencher;
 #[bench]
 fn shuffle_rand_pcg32(b: &mut Bencher) {
     let mut rng = Pcg32::from_rng(thread_rng()).unwrap();
-    let x: &mut [usize] = &mut [1; 100];
+    let mut x = (0..100).collect::<Vec::<usize>>();
     b.iter(|| {
         x.shuffle(&mut rng);
         x[0]
@@ -19,9 +19,9 @@ fn shuffle_rand_pcg32(b: &mut Bencher) {
 #[bench]
 fn shuffle_fastrand(b: &mut Bencher) {
     let rng = fastrand::Rng::new();
-    let x: &mut [usize] = &mut [1; 100];
+    let mut x = (0..100).collect::<Vec::<usize>>();
     b.iter(|| {
-        rng.shuffle(x);
+        rng.shuffle(&mut x);
         x[0]
     })
 }
