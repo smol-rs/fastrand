@@ -28,6 +28,48 @@ fn i8() {
 }
 
 #[test]
+fn u32() {
+    for n in 1u32..10_000 {
+        let n = n.wrapping_mul(n);
+        let n = n.wrapping_mul(n);
+        if n != 0 {
+            for _ in 0..1000 {
+                assert!(fastrand::u32(..n) < n);
+            }
+        }
+    }
+}
+
+#[test]
+fn u64() {
+    for n in 1u64..10_000 {
+        let n = n.wrapping_mul(n);
+        let n = n.wrapping_mul(n);
+        let n = n.wrapping_mul(n);
+        if n != 0 {
+            for _ in 0..1000 {
+                assert!(fastrand::u64(..n) < n);
+            }
+        }
+    }
+}
+
+#[test]
+fn u128() {
+    for n in 1u128..10_000 {
+        let n = n.wrapping_mul(n);
+        let n = n.wrapping_mul(n);
+        let n = n.wrapping_mul(n);
+        let n = n.wrapping_mul(n);
+        if n != 0 {
+            for _ in 0..1000 {
+                assert!(fastrand::u128(..n) < n);
+            }
+        }
+    }
+}
+
+#[test]
 fn rng() {
     let r = fastrand::Rng::new();
 
