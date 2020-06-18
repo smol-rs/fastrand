@@ -93,7 +93,10 @@ impl Rng {
     fn gen_u32(&self) -> u32 {
         // Adapted from: https://en.wikipedia.org/wiki/Permuted_congruential_generator
         let s = self.0.get();
-        self.0.set(s.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407));
+        self.0.set(
+            s.wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407),
+        );
         (((s ^ (s >> 18)) >> 27) as u32).rotate_right((s >> 59) as u32)
     }
 
@@ -112,19 +115,55 @@ impl Rng {
     /// Generates a random `u32` in `0..n`.
     #[inline]
     fn gen_mod_u32(&self, n: u32) -> u32 {
-        mul_high_u32(self.gen_u64() as u32, n)
+        // Adapted from: https://lemire.me/blog/2016/06/30/fast-random-shuffling/
+        let mut r = self.gen_u32();
+        let mut hi = mul_high_u32(r, n);
+        let mut lo = r.wrapping_mul(n);
+        if lo < n {
+            let t = n.wrapping_neg() % n;
+            while lo < t {
+                r = self.gen_u32();
+                hi = mul_high_u32(r, n);
+                lo = r.wrapping_mul(n);
+            }
+        }
+        hi
     }
 
     /// Generates a random `u64` in `0..n`.
     #[inline]
     fn gen_mod_u64(&self, n: u64) -> u64 {
-        mul_high_u64(self.gen_u64(), n)
+        // Adapted from: https://lemire.me/blog/2016/06/30/fast-random-shuffling/
+        let mut r = self.gen_u64();
+        let mut hi = mul_high_u64(r, n);
+        let mut lo = r.wrapping_mul(n);
+        if lo < n {
+            let t = n.wrapping_neg() % n;
+            while lo < t {
+                r = self.gen_u64();
+                hi = mul_high_u64(r, n);
+                lo = r.wrapping_mul(n);
+            }
+        }
+        hi
     }
 
     /// Generates a random `u128` in `0..n`.
     #[inline]
     fn gen_mod_u128(&self, n: u128) -> u128 {
-        mul_high_u128(self.gen_u128(), n)
+        // Adapted from: https://lemire.me/blog/2016/06/30/fast-random-shuffling/
+        let mut r = self.gen_u128();
+        let mut hi = mul_high_u128(r, n);
+        let mut lo = r.wrapping_mul(n);
+        if lo < n {
+            let t = n.wrapping_neg() % n;
+            while lo < t {
+                r = self.gen_u128();
+                hi = mul_high_u128(r, n);
+                lo = r.wrapping_mul(n);
+            }
+        }
+        hi
     }
 }
 
@@ -210,7 +249,10 @@ impl Rng {
     #[inline]
     pub fn new() -> Rng {
         let rng = Rng(Cell::new(0));
-        rng.seed(RNG.try_with(|rng| rng.u64(..)).unwrap_or(0x4d595df4d0f33173));
+        rng.seed(
+            RNG.try_with(|rng| rng.u64(..))
+                .unwrap_or(0x4d595df4d0f33173),
+        );
         rng
     }
 
@@ -355,6 +397,13 @@ impl Rng {
         usize,
         gen_u64,
         gen_mod_u64,
+        "Generates a random `usize` in the given range."
+    );
+    #[cfg(target_pointer_width = "128")]
+    rng_integer!(
+        usize,
+        gen_u128,
+        gen_mod_u128,
         "Generates a random `usize` in the given range."
     );
 }
