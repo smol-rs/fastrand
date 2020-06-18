@@ -1,3 +1,9 @@
+# Version 1.2.4
+
+- Switch to PCG XSH RR 64/32.
+- Fix a bug in `gen_mod_u128`.
+- Fix bias in ranges.
+
 # Version 1.2.3
 
 - Support Rust 1.32.0
