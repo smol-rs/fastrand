@@ -1,6 +1,6 @@
 //! A simple random number generator.
 //!
-//! The implementation uses [PCG XSH RS 64/32][paper], a simple and fast generator but not
+//! The implementation uses [PCG XSH RR 64/32][paper], a simple and fast generator but not
 //! cryptographically secure.
 //!
 //! [paper]: https://www.pcg-random.org/pdf/hmc-cs-2014-0905.pdf
@@ -93,10 +93,8 @@ impl Rng {
     fn gen_u32(&self) -> u32 {
         // Adapted from: https://en.wikipedia.org/wiki/Permuted_congruential_generator
         let s = self.0.get();
-        self.0.set(s.wrapping_mul(6364136223846793005));
-        let count = s >> 61;
-        let x = s ^ (s >> 22);
-        (x >> (22 + count)) as u32
+        self.0.set(s.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407));
+        (((s ^ (s >> 18)) >> 27) as u32).rotate_right((s >> 59) as u32)
     }
 
     /// Generates a random `u64`.
@@ -212,7 +210,7 @@ impl Rng {
     #[inline]
     pub fn new() -> Rng {
         let rng = Rng(Cell::new(0));
-        rng.seed(RNG.try_with(|rng| rng.u64(..)).unwrap_or(1157102669));
+        rng.seed(RNG.try_with(|rng| rng.u64(..)).unwrap_or(0x4d595df4d0f33173));
         rng
     }
 
@@ -291,7 +289,7 @@ impl Rng {
     /// Initializes this generator with the given seed.
     #[inline]
     pub fn seed(&self, seed: u64) {
-        self.0.set((seed << 1) | 1);
+        self.0.set(seed.wrapping_add(1442695040888963407));
         self.gen_u32();
     }
 
