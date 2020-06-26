@@ -1,3 +1,7 @@
+# Version 1.3.2
+
+- Support older Rust versions.
+
 # Version 1.3.1
 
 - Tweak Cargo keywords.

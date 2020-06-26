@@ -303,14 +303,14 @@ impl Rng {
     /// Generates a random `f32` in range `0..1`.
     pub fn f32(&self) -> f32 {
         let b = 32;
-        let f = f32::MANTISSA_DIGITS - 1;
+        let f = std::f32::MANTISSA_DIGITS - 1;
         f32::from_bits((1 << (b - 2)) - (1 << f) + (self.u32(..) >> (b - f))) - 1.0
     }
 
     /// Generates a random `f64` in range `0..1`.
     pub fn f64(&self) -> f64 {
         let b = 64;
-        let f = f64::MANTISSA_DIGITS - 1;
+        let f = std::f64::MANTISSA_DIGITS - 1;
         f64::from_bits((1 << (b - 2)) - (1 << f) + (self.u64(..) >> (b - f))) - 1.0
     }
 
