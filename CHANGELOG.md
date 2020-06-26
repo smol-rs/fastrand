@@ -1,3 +1,8 @@
+# Version 1.3.0
+
+- Add `f32()` and `f64()`.
+- Add `lowercase()`, `uppercase()`, `alphabetic()`, and `digit()`.
+
 # Version 1.2.4
 
 - Switch to PCG XSH RR 64/32.
