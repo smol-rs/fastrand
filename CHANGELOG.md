@@ -1,3 +1,7 @@
+# Version 1.3.1
+
+- Tweak Cargo keywords.
+
 # Version 1.3.0
 
 - Add `f32()` and `f64()`.
