@@ -1,6 +1,6 @@
 //! A simple random number generator.
 //!
-//! The implementation uses [PCG XSH RR 64/32][paper], a simple and fast generator but not
+//! The implementation uses [PCG XSH RR 64/32][paper], a simple and fast generator but **not**
 //! cryptographically secure.
 //!
 //! [paper]: https://www.pcg-random.org/pdf/hmc-cs-2014-0905.pdf
@@ -300,6 +300,20 @@ impl Rng {
         }
     }
 
+    /// Generates a random `f32` in range `0..1`.
+    pub fn f32(&self) -> f32 {
+        let b = 32;
+        let f = f32::MANTISSA_DIGITS - 1;
+        f32::from_bits((1 << (b - 2)) - (1 << f) + (self.u32(..) >> (b - f))) - 1.0
+    }
+
+    /// Generates a random `f64` in range `0..1`.
+    pub fn f64(&self) -> f64 {
+        let b = 64;
+        let f = f64::MANTISSA_DIGITS - 1;
+        f64::from_bits((1 << (b - 2)) - (1 << f) + (self.u64(..) >> (b - f))) - 1.0
+    }
+
     rng_integer!(
         i8,
         gen_u32,
@@ -531,3 +545,13 @@ integer!(u128, "Generates a random `u128` in the given range.");
 integer!(i128, "Generates a random `i128` in the given range.");
 integer!(usize, "Generates a random `usize` in the given range.");
 integer!(isize, "Generates a random `isize` in the given range.");
+
+/// Generates a random `f32` in range `0..1`.
+pub fn f32() -> f32 {
+    RNG.with(|rng| rng.f32())
+}
+
+/// Generates a random `f64` in range `0..1`.
+pub fn f64() -> f64 {
+    RNG.with(|rng| rng.f64())
+}

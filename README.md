@@ -11,7 +11,7 @@ https://docs.rs/fastrand)
 
 A simple random number generator.
 
-The implementation uses [PCG XSH RR 64/32][paper], a simple and fast generator but not
+The implementation uses [PCG XSH RR 64/32][paper], a simple and fast generator but **not**
 cryptographically secure.
 
 [paper]: https://www.pcg-random.org/pdf/hmc-cs-2014-0905.pdf

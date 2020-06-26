@@ -15,3 +15,4 @@ readme = "README.md"
 [dev-dependencies]
 rand = "0.7.3"
 rand_pcg = "0.2.1"
+getrandom = "0.1.14"
