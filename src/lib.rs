@@ -255,6 +255,15 @@ impl Rng {
         rng
     }
 
+    /// Generates a random `char` in ranges a-z and A-Z.
+    #[inline]
+    pub fn alphabetic(&self) -> char {
+        const CHARS: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        let len = CHARS.len() as u8;
+        let i = self.u8(..len);
+        CHARS[i as usize] as char
+    }
+
     /// Generates a random `char` in ranges a-z, A-Z and 0-9.
     #[inline]
     pub fn alphanumeric(&self) -> char {
@@ -268,6 +277,27 @@ impl Rng {
     #[inline]
     pub fn bool(&self) -> bool {
         self.u8(..) % 2 == 0
+    }
+
+    /// Generates a random digit in the given `base`.
+    ///
+    /// Digits are represented by `char`s in ranges 0-9 and a-z.
+    ///
+    /// Panics if the base is zero or greater than 36.
+    #[inline]
+    pub fn digit(&self, base: u32) -> char {
+        if base == 0 {
+            panic!("base cannot be zero");
+        }
+        if base > 36 {
+            panic!("base cannot be larger than 36");
+        }
+        let num = self.u8(..base as u8);
+        if num < 10 {
+            (b'0' + num) as char
+        } else {
+            (b'a' + num - 10) as char
+        }
     }
 
     rng_integer!(
@@ -326,6 +356,15 @@ impl Rng {
         gen_mod_u64,
         "Generates a random `isize` in the given range."
     );
+
+    /// Generates a random `char` in range a-z.
+    #[inline]
+    pub fn lowercase(&self) -> char {
+        const CHARS: &[u8] = b"abcdefghijklmnopqrstuvwxyz";
+        let len = CHARS.len() as u8;
+        let i = self.u8(..len);
+        CHARS[i as usize] as char
+    }
 
     /// Initializes this generator with the given seed.
     #[inline]
@@ -405,6 +444,15 @@ impl Rng {
         gen_mod_u128,
         "Generates a random `usize` in the given range."
     );
+
+    /// Generates a random `char` in range A-Z.
+    #[inline]
+    pub fn uppercase(&self) -> char {
+        const CHARS: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        let len = CHARS.len() as u8;
+        let i = self.u8(..len);
+        CHARS[i as usize] as char
+    }
 }
 
 /// Initializes the thread-local generator with the given seed.
@@ -419,10 +467,38 @@ pub fn bool() -> bool {
     RNG.with(|rng| rng.bool())
 }
 
+/// Generates a random `char` in ranges a-z and A-Z.
+#[inline]
+pub fn alphabetic() -> char {
+    RNG.with(|rng| rng.alphabetic())
+}
+
 /// Generates a random `char` in ranges a-z, A-Z and 0-9.
 #[inline]
 pub fn alphanumeric() -> char {
     RNG.with(|rng| rng.alphanumeric())
+}
+
+/// Generates a random `char` in range a-z.
+#[inline]
+pub fn lowercase() -> char {
+    RNG.with(|rng| rng.lowercase())
+}
+
+/// Generates a random `char` in range A-Z.
+#[inline]
+pub fn uppercase() -> char {
+    RNG.with(|rng| rng.uppercase())
+}
+
+/// Generates a random digit in the given `base`.
+///
+/// Digits are represented by `char`s in ranges 0-9 and a-z.
+///
+/// Panics if the base is zero or greater than 36.
+#[inline]
+pub fn digit(base: u32) -> char {
+    RNG.with(|rng| rng.digit(base))
 }
 
 /// Shuffles a slice randomly.
