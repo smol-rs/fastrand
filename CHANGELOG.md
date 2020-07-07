@@ -1,3 +1,7 @@
+# Version 1.3.3
+
+- Forbid unsafe code.
+
 # Version 1.3.2
 
 - Support older Rust versions.
