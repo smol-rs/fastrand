@@ -1,3 +1,7 @@
+# Version 1.3.4
+
+- Implement `Clone` for `Rng`.
+
 # Version 1.3.3
 
 - Forbid unsafe code.
