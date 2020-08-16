@@ -110,11 +110,7 @@ impl Clone for Rng {
     /// assert_eq!(rng1.u64(..), rng2.u64(..), "the cloned generators are identical");
     /// ```
     fn clone(&self) -> Rng {
-        let seed = self.gen_u64();
-        let rng = Rng(Cell::new(0));
-
-        rng.seed(seed);
-        rng
+        Rng::with_seed(self.gen_u64())
     }
 }
 
@@ -278,11 +274,28 @@ impl Rng {
     /// Creates a new random number generator.
     #[inline]
     pub fn new() -> Rng {
-        let rng = Rng(Cell::new(0));
-        rng.seed(
+        Rng::with_seed(
             RNG.try_with(|rng| rng.u64(..))
                 .unwrap_or(0x4d595df4d0f33173),
-        );
+        )
+    }
+
+    /// Create a random number generator from a seed.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// let r = fastrand::Rng::with_seed(7);
+    /// let s = fastrand::Rng::new();
+    /// s.seed(7);
+    ///
+    /// assert_eq!(r.u64(..), s.u64(..));
+    /// ```
+    #[inline]
+    pub fn with_seed(seed: u64) -> Self {
+        let rng = Rng(Cell::new(0));
+
+        rng.seed(seed);
         rng
     }
 
