@@ -280,17 +280,7 @@ impl Rng {
         )
     }
 
-    /// Create a random number generator from a seed.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// let r = fastrand::Rng::with_seed(7);
-    /// let s = fastrand::Rng::new();
-    /// s.seed(7);
-    ///
-    /// assert_eq!(r.u64(..), s.u64(..));
-    /// ```
+    /// Creates a new random number generator with the initial seed.
     #[inline]
     pub fn with_seed(seed: u64) -> Self {
         let rng = Rng(Cell::new(0));

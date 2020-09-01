@@ -92,3 +92,11 @@ fn rng_init() {
     b.seed(7);
     assert_eq!(a.u64(..), b.u64(..));
 }
+
+#[test]
+fn with_seed() {
+    let a = fastrand::Rng::with_seed(7);
+    let b = fastrand::Rng::new();
+    b.seed(7);
+    assert_eq!(a.u64(..), b.u64(..));
+}
