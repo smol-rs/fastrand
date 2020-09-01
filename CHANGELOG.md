@@ -1,6 +1,7 @@
 # Version 1.3.5
 
 - Reword docs.
+- Add `Rng::with_seed()`.
 
 # Version 1.3.4
 
