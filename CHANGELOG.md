@@ -1,3 +1,7 @@
+# Version 1.3.5
+
+- Reword docs.
+
 # Version 1.3.4
 
 - Implement `Clone` for `Rng`.
