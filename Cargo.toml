@@ -3,12 +3,12 @@ name = "fastrand"
 version = "1.3.4"
 authors = ["Stjepan Glavina <stjepang@gmail.com>"]
 edition = "2018"
-description = "A simple random number generator"
+description = "A simple and fast random number generator"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/stjepang/fastrand"
 homepage = "https://github.com/stjepang/fastrand"
 documentation = "https://docs.rs/fastrand"
-keywords = ["easy", "simple", "rand", "random", "pcg"]
+keywords = ["simple", "fast", "rand", "random", "pcg"]
 categories = ["algorithms"]
 readme = "README.md"
 

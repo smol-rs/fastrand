@@ -9,7 +9,7 @@ https://crates.io/crates/fastrand)
 [![Documentation](https://docs.rs/fastrand/badge.svg)](
 https://docs.rs/fastrand)
 
-A simple random number generator.
+A simple and fast random number generator.
 
 The implementation uses [PCG XSH RR 64/32][paper], a simple and fast generator but **not**
 cryptographically secure.
