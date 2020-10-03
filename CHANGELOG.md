@@ -1,3 +1,7 @@
+# Version 1.4.0
+
+- Add wasm support.
+
 # Version 1.3.5
 
 - Reword docs.
