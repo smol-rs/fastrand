@@ -75,7 +75,11 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use std::ops::{Bound, RangeBounds};
 use std::thread;
+
+#[cfg(not(target_arch = "wasm32"))]
 use std::time::Instant;
+#[cfg(target_arch = "wasm32")]
+use instant::Instant;
 
 /// A random number generator.
 #[derive(Debug)]
