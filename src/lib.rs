@@ -416,8 +416,7 @@ impl Rng {
     /// Initializes this generator with the given seed.
     #[inline]
     pub fn seed(&self, seed: u64) {
-        self.0.set(seed.wrapping_add(1442695040888963407));
-        self.gen_u32();
+        self.0.set(seed);
     }
 
     /// Shuffles a slice randomly.
