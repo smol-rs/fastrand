@@ -11,10 +11,8 @@ https://docs.rs/fastrand)
 
 A simple and fast random number generator.
 
-The implementation uses [PCG XSH RR 64/32][paper], a simple and fast generator but **not**
-cryptographically secure.
-
-[paper]: https://www.pcg-random.org/pdf/hmc-cs-2014-0905.pdf
+The implementation uses [Wyrand](https://github.com/wangyi-fudan/wyhash), a simple and fast
+generator but **not** cryptographically secure.
 
 ## Examples
 
