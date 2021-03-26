@@ -234,7 +234,7 @@ fn mul_high_u128(a: u128, b: u128) -> u128 {
 }
 
 macro_rules! rng_integer {
-    ($t:tt, $gen:tt, $mod:tt, $doc:tt) => {
+    ($t:tt, $unsigned_t:tt, $gen:tt, $mod:tt, $doc:tt) => {
         #[doc = $doc]
         ///
         /// Panics if the range is empty.
@@ -268,7 +268,7 @@ macro_rules! rng_integer {
                 self.$gen() as $t
             } else {
                 let len = high.wrapping_sub(low).wrapping_add(1);
-                low.wrapping_add(self.$mod(len as _) as $t)
+                low.wrapping_add(self.$mod(len as $unsigned_t as _) as $t)
             }
         }
     };
@@ -354,6 +354,7 @@ impl Rng {
 
     rng_integer!(
         i8,
+        u8,
         gen_u32,
         gen_mod_u32,
         "Generates a random `i8` in the given range."
@@ -361,6 +362,7 @@ impl Rng {
 
     rng_integer!(
         i16,
+        u16,
         gen_u32,
         gen_mod_u32,
         "Generates a random `i16` in the given range."
@@ -368,6 +370,7 @@ impl Rng {
 
     rng_integer!(
         i32,
+        u32,
         gen_u32,
         gen_mod_u32,
         "Generates a random `i32` in the given range."
@@ -375,6 +378,7 @@ impl Rng {
 
     rng_integer!(
         i64,
+        u64,
         gen_u64,
         gen_mod_u64,
         "Generates a random `i64` in the given range."
@@ -382,6 +386,7 @@ impl Rng {
 
     rng_integer!(
         i128,
+        u128,
         gen_u128,
         gen_mod_u128,
         "Generates a random `i128` in the given range."
@@ -390,6 +395,7 @@ impl Rng {
     #[cfg(target_pointer_width = "16")]
     rng_integer!(
         isize,
+        usize,
         gen_u32,
         gen_mod_u32,
         "Generates a random `isize` in the given range."
@@ -397,6 +403,7 @@ impl Rng {
     #[cfg(target_pointer_width = "32")]
     rng_integer!(
         isize,
+        usize,
         gen_u32,
         gen_mod_u32,
         "Generates a random `isize` in the given range."
@@ -404,6 +411,7 @@ impl Rng {
     #[cfg(target_pointer_width = "64")]
     rng_integer!(
         isize,
+        usize,
         gen_u64,
         gen_mod_u64,
         "Generates a random `isize` in the given range."
@@ -435,12 +443,14 @@ impl Rng {
 
     rng_integer!(
         u8,
+        u8,
         gen_u32,
         gen_mod_u32,
         "Generates a random `u8` in the given range."
     );
 
     rng_integer!(
+        u16,
         u16,
         gen_u32,
         gen_mod_u32,
@@ -449,6 +459,7 @@ impl Rng {
 
     rng_integer!(
         u32,
+        u32,
         gen_u32,
         gen_mod_u32,
         "Generates a random `u32` in the given range."
@@ -456,12 +467,14 @@ impl Rng {
 
     rng_integer!(
         u64,
+        u64,
         gen_u64,
         gen_mod_u64,
         "Generates a random `u64` in the given range."
     );
 
     rng_integer!(
+        u128,
         u128,
         gen_u128,
         gen_mod_u128,
@@ -471,12 +484,14 @@ impl Rng {
     #[cfg(target_pointer_width = "16")]
     rng_integer!(
         usize,
+        usize,
         gen_u32,
         gen_mod_u32,
         "Generates a random `usize` in the given range."
     );
     #[cfg(target_pointer_width = "32")]
     rng_integer!(
+        usize,
         usize,
         gen_u32,
         gen_mod_u32,
@@ -485,12 +500,14 @@ impl Rng {
     #[cfg(target_pointer_width = "64")]
     rng_integer!(
         usize,
+        usize,
         gen_u64,
         gen_mod_u64,
         "Generates a random `usize` in the given range."
     );
     #[cfg(target_pointer_width = "128")]
     rng_integer!(
+        usize,
         usize,
         gen_u128,
         gen_mod_u128,
