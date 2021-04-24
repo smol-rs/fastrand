@@ -1,6 +1,9 @@
 [package]
 name = "fastrand"
-version = "1.4.0"
+# When publishing a new version:
+# - Update CHANGELOG.md
+# - Create "v1.x.y" git tag
+version = "1.4.1"
 authors = ["Stjepan Glavina <stjepang@gmail.com>"]
 edition = "2018"
 description = "A simple and fast random number generator"
