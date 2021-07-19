@@ -1,9 +1,7 @@
 //! A simple and fast random number generator.
 //!
-//! The implementation uses [PCG XSH RR 64/32][paper], a simple and fast generator but **not**
-//! cryptographically secure.
-//!
-//! [paper]: https://www.pcg-random.org/pdf/hmc-cs-2014-0905.pdf
+//! The implementation uses [Wyrand](https://github.com/wangyi-fudan/wyhash), a simple and fast
+//! generator but **not** cryptographically secure.
 //!
 //! # Examples
 //!
@@ -122,25 +120,22 @@ impl Rng {
     /// Generates a random `u32`.
     #[inline]
     fn gen_u32(&self) -> u32 {
-        // Adapted from: https://en.wikipedia.org/wiki/Permuted_congruential_generator
-        let s = self.0.get();
-        self.0.set(
-            s.wrapping_mul(6364136223846793005)
-                .wrapping_add(1442695040888963407),
-        );
-        (((s ^ (s >> 18)) >> 27) as u32).rotate_right((s >> 59) as u32)
+        self.gen_u64() as u32
     }
 
     /// Generates a random `u64`.
     #[inline]
     fn gen_u64(&self) -> u64 {
-        ((self.gen_u32() as u64) << 32) | (self.gen_u32() as u64)
+        let s = self.0.get().wrapping_add(0xA0761D6478BD642F);
+        self.0.set(s);
+        let t = u128::from(s) * u128::from(s ^ 0xE7037ED1A0B428DB);
+        (t as u64) ^ (t >> 64) as u64
     }
 
     /// Generates a random `u128`.
     #[inline]
     fn gen_u128(&self) -> u128 {
-        ((self.gen_u64() as u128) << 64) | (self.gen_u64() as u128)
+        (u128::from(self.gen_u64()) << 64) | u128::from(self.gen_u64())
     }
 
     /// Generates a random `u32` in `0..n`.
@@ -429,8 +424,7 @@ impl Rng {
     /// Initializes this generator with the given seed.
     #[inline]
     pub fn seed(&self, seed: u64) {
-        self.0.set(seed.wrapping_add(1442695040888963407));
-        self.gen_u32();
+        self.0.set(seed);
     }
 
     /// Shuffles a slice randomly.
