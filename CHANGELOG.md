@@ -1,3 +1,7 @@
+# Version 1.5.0
+
+- Switch to Wyrand (#14)
+
 # Version 1.4.1
 
 - Fix bug when generating a signed integer within a range (#16)
