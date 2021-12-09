@@ -80,7 +80,7 @@ use instant::Instant;
 use std::time::Instant;
 
 /// A random number generator.
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Rng(Cell<u64>);
 
 impl Default for Rng {
