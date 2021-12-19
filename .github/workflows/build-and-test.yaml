@@ -48,6 +48,7 @@ jobs:
 
       - name: Test wasm
         run: wasm-pack test --headless --chrome
+        if: startsWith(matrix.os, 'ubuntu')
 
       - name: Benchmarks
         if: startsWith(matrix.rust, 'nightly')
