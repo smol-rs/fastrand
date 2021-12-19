@@ -10,7 +10,6 @@ description = "A simple and fast random number generator"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/smol-rs/fastrand"
 homepage = "https://github.com/smol-rs/fastrand"
-documentation = "https://docs.rs/fastrand"
 keywords = ["simple", "fast", "rand", "random", "wyrand"]
 categories = ["algorithms"]
 
