@@ -6,12 +6,14 @@ name = "fastrand"
 version = "1.6.0"
 authors = ["Stjepan Glavina <stjepang@gmail.com>"]
 edition = "2018"
+rust-version = "1.34"
 description = "A simple and fast random number generator"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/smol-rs/fastrand"
 homepage = "https://github.com/smol-rs/fastrand"
 keywords = ["simple", "fast", "rand", "random", "wyrand"]
 categories = ["algorithms"]
+exclude = ["/.*"]
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 instant = "0.1"
