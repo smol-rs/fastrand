@@ -79,18 +79,38 @@ use instant::Instant;
 #[cfg(not(target_arch = "wasm32"))]
 use std::time::Instant;
 
+pub trait Seed {
+    fn with_seed(seed: u64) -> Rng<Self> where Self: Sized;
+    fn get(&self) -> u64;
+    fn set(&self, new_seed: u64);
+}
+
+// Seed abstraction, so users can specify their own
+#[derive(Debug, PartialEq, Eq)]
+pub struct CellSeed(Cell<u64>);
+
+impl Seed for CellSeed {
+    fn with_seed(seed: u64) -> Rng<CellSeed> {
+        let rng = Rng(CellSeed(Cell::new(0)));
+        rng.seed(seed);
+        rng
+    }
+    fn get(&self) -> u64 { self.0.get() }
+    fn set(&self, new_seed: u64) { self.0.set(new_seed); }
+}
+
 /// A random number generator.
 #[derive(Debug, PartialEq, Eq)]
-pub struct Rng(Cell<u64>);
+pub struct Rng<T: Seed>(T);
 
-impl Default for Rng {
+impl<T: Seed> Default for Rng<T> {
     #[inline]
-    fn default() -> Rng {
+    fn default() -> Self {
         Rng::new()
     }
 }
 
-impl Clone for Rng {
+impl<S: Seed + Clone> Clone for Rng<S> {
     /// Clones the generator by deterministically deriving a new generator based on the initial
     /// seed.
     ///
@@ -111,12 +131,12 @@ impl Clone for Rng {
     ///
     /// assert_eq!(rng1.u64(..), rng2.u64(..), "the cloned generators are identical");
     /// ```
-    fn clone(&self) -> Rng {
-        Rng::with_seed(self.gen_u64())
+    fn clone(&self) -> Rng<S> {
+        S::with_seed(self.gen_u64())
     }
 }
 
-impl Rng {
+impl<S: Seed> Rng<S> {
     /// Generates a random `u32`.
     #[inline]
     fn gen_u32(&self) -> u32 {
@@ -194,13 +214,13 @@ impl Rng {
 }
 
 thread_local! {
-    static RNG: Rng = Rng(Cell::new({
+    static RNG: Rng<CellSeed> = Rng(CellSeed(Cell::new({
         let mut hasher = DefaultHasher::new();
         Instant::now().hash(&mut hasher);
         thread::current().id().hash(&mut hasher);
         let hash = hasher.finish();
         (hash << 1) | 1
-    }));
+    })));
 }
 
 /// Computes `(a * b) >> 32`.
@@ -269,23 +289,25 @@ macro_rules! rng_integer {
     };
 }
 
-impl Rng {
+impl<S: Seed> Rng<S> {
     /// Creates a new random number generator.
     #[inline]
-    pub fn new() -> Rng {
-        Rng::with_seed(
+    pub fn new() -> Self {
+        S::with_seed(
             RNG.try_with(|rng| rng.u64(..))
                 .unwrap_or(0x4d595df4d0f33173),
         )
     }
 
+    #[inline]
+    pub fn from(seed: S) -> Rng<S> {
+        Rng(seed)
+    }
+
     /// Creates a new random number generator with the initial seed.
     #[inline]
     pub fn with_seed(seed: u64) -> Self {
-        let rng = Rng(Cell::new(0));
-
-        rng.seed(seed);
-        rng
+        S::with_seed(seed)
     }
 
     /// Generates a random `char` in ranges a-z and A-Z.

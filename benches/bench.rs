@@ -5,6 +5,7 @@ extern crate test;
 use rand::prelude::*;
 use test::Bencher;
 use wyhash::WyRng;
+use fastrand::CellSeed;
 
 #[bench]
 fn shuffle_wyhash(b: &mut Bencher) {
@@ -18,7 +19,7 @@ fn shuffle_wyhash(b: &mut Bencher) {
 
 #[bench]
 fn shuffle_fastrand(b: &mut Bencher) {
-    let rng = fastrand::Rng::new();
+    let rng = fastrand::Rng::<CellSeed>::new();
     let mut x = (0..100).collect::<Vec<usize>>();
     b.iter(|| {
         rng.shuffle(&mut x);
@@ -40,7 +41,7 @@ fn u8_wyhash(b: &mut Bencher) {
 
 #[bench]
 fn u8_fastrand(b: &mut Bencher) {
-    let rng = fastrand::Rng::new();
+    let rng = fastrand::Rng::<CellSeed>::new();
     b.iter(|| {
         let mut sum = 0u8;
         for _ in 0..10_000 {
@@ -64,7 +65,7 @@ fn u32_wyhash(b: &mut Bencher) {
 
 #[bench]
 fn u32_fastrand(b: &mut Bencher) {
-    let rng = fastrand::Rng::new();
+    let rng = fastrand::Rng::<CellSeed>::new();
     b.iter(|| {
         let mut sum = 0u32;
         for _ in 0..10_000 {
