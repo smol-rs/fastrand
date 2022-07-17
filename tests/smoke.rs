@@ -120,6 +120,15 @@ fn with_seed() {
 }
 
 #[test]
+fn choose_multiple() {
+    let a = fastrand::Rng::with_seed(7);
+    assert_eq!(
+        a.choose_multiple(0..20, 12),
+        vec![0, 1, 17, 15, 4, 14, 6, 7, 19, 9, 18, 13]
+    );
+}
+
+#[test]
 fn choice() {
     let items = [1, 4, 9, 5, 2, 3, 6, 7, 8, 0];
     let mut r = fastrand::Rng::new();
