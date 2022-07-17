@@ -29,6 +29,14 @@
 //! let elem = v[i];
 //! ```
 //!
+//! Sample values from an array with `O(n)` complexity (`n` is the length of array):
+//!
+//! ```
+//! fastrand::choose_multiple(vec![1, 4, 5].iter(), 2);
+//! fastrand::choose_multiple(0..20, 12);
+//! ```
+//!
+//!
 //! Shuffle an array:
 //!
 //! ```
@@ -345,6 +353,43 @@ impl Rng {
         let b = 64;
         let f = std::f64::MANTISSA_DIGITS - 1;
         f64::from_bits((1 << (b - 2)) - (1 << f) + (self.u64(..) >> (b - f))) - 1.0
+    }
+
+    /// Collects `amount` values at random from the iterator into a vector.
+    ///
+    /// The length of the returned vector equals `amount` unless the iterator
+    /// contains insufficient elements, in which case it equals the number of
+    /// elements available.
+    ///
+    /// Complexity is `O(n)` where `n` is the length of the iterator.
+    pub fn choose_multiple<T: std::iter::Iterator + Sized>(
+        &self,
+        mut source: T,
+        amount: usize,
+    ) -> Vec<T::Item> {
+        // Adapted from: https://docs.rs/rand/latest/rand/seq/trait.IteratorRandom.html#method.choose_multiple
+        let mut reservoir = Vec::with_capacity(amount);
+
+        reservoir.extend(source.by_ref().take(amount));
+
+        // Continue unless the iterator was exhausted
+        //
+        // note: this prevents iterators that "restart" from causing problems.
+        // If the iterator stops once, then so do we.
+        if reservoir.len() == amount {
+            for (i, elem) in source.enumerate() {
+                let end = i + 1 + amount;
+                let k = self.usize(0..end);
+                if let Some(slot) = reservoir.get_mut(k) {
+                    *slot = elem;
+                }
+            }
+        } else {
+            // Don't hang onto extra memory. There is a corner case where
+            // `amount` was much less than `self.len()`.
+            reservoir.shrink_to_fit();
+        }
+        reservoir
     }
 
     rng_integer!(
@@ -665,4 +710,9 @@ pub fn f32() -> f32 {
 /// Generates a random `f64` in range `0..1`.
 pub fn f64() -> f64 {
     RNG.with(|rng| rng.f64())
+}
+
+/// Collects `amount` values at random from the iterator into a vector.
+pub fn choose_multiple<T: std::iter::Iterator + Sized>(source: T, amount: usize) -> Vec<T::Item> {
+    RNG.with(|rng| rng.choose_multiple(source, amount))
 }
