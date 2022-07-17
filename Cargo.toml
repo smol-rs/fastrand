@@ -22,7 +22,11 @@ instant = { version = "0.1", features = ["wasm-bindgen"] }
 wasm-bindgen-test = "0.3"
 getrandom = { version = "0.2", features = ["js"] }
 
+[dependencies]
+rand_core = "0.6"
+
 [dev-dependencies]
 rand = "0.8"
 wyhash = "0.5"
 getrandom = "0.2"
+rand_core = "0.6"

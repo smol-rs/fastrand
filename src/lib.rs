@@ -3,6 +3,8 @@
 //! The implementation uses [Wyrand](https://github.com/wangyi-fudan/wyhash), a simple and fast
 //! generator but **not** cryptographically secure.
 //!
+//! It implements the trait `rand::Rng` so it should work in most libraries that accept an random number generator.
+//!
 //! # Examples
 //!
 //! Flip a coin:
@@ -76,6 +78,8 @@ use std::thread;
 
 #[cfg(target_arch = "wasm32")]
 use instant::Instant;
+use rand_core::{impls, RngCore};
+
 #[cfg(not(target_arch = "wasm32"))]
 use std::time::Instant;
 
@@ -193,6 +197,22 @@ impl Rng {
     }
 }
 
+impl RngCore for Rng {
+    fn next_u32(&mut self) -> u32 {
+        self.gen_u32()
+    }
+    fn next_u64(&mut self) -> u64 {
+        self.gen_u64()
+    }
+    fn fill_bytes(&mut self, dest: &mut [u8]) {
+        impls::fill_bytes_via_next(self, dest)
+    }
+    fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), rand_core::Error> {
+        self.fill_bytes(dest);
+        Ok(())
+    }
+}
+
 thread_local! {
     static RNG: Rng = Rng(Cell::new({
         let mut hasher = DefaultHasher::new();
@@ -200,6 +220,7 @@ thread_local! {
         thread::current().id().hash(&mut hasher);
         let hash = hasher.finish();
         (hash << 1) | 1
+
     }));
 }
 

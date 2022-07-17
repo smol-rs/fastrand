@@ -1,3 +1,4 @@
+use rand::prelude::IteratorRandom;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen_test::*;
 
@@ -114,4 +115,17 @@ fn with_seed() {
     let b = fastrand::Rng::new();
     b.seed(7);
     assert_eq!(a.u64(..), b.u64(..));
+}
+
+#[test]
+fn rand_core() {
+    let mut a = fastrand::Rng::with_seed(7);
+    assert_eq!(
+        "abcde"
+            .chars()
+            .choose_multiple(&mut a, 2)
+            .into_iter()
+            .collect::<String>(),
+        "ad"
+    );
 }

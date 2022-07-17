@@ -14,6 +14,8 @@ A simple and fast random number generator.
 The implementation uses [Wyrand](https://github.com/wangyi-fudan/wyhash), a simple and fast
 generator but **not** cryptographically secure.
 
+It implements the trait `rand::Rng` so it should work in most libraries that accept an random number generator. 
+
 ## Examples
 
 Flip a coin:
