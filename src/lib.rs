@@ -591,6 +591,12 @@ pub fn seed(seed: u64) {
     RNG.with(|rng| rng.seed(seed))
 }
 
+/// Gives back **current** seed that is being held by the thread-local generator.
+#[inline]
+pub fn get_seed() -> u64 {
+    RNG.with(|rng| rng.get_seed())
+}
+
 /// Generates a random `bool`.
 #[inline]
 pub fn bool() -> bool {
