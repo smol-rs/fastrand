@@ -427,6 +427,12 @@ impl Rng {
         self.0.set(seed);
     }
 
+    /// Gives back **current** seed that is being held by this generator.
+    #[inline]
+    pub fn get_seed(&self) -> u64 {
+        self.0.get()
+    }
+
     /// Shuffles a slice randomly.
     #[inline]
     pub fn shuffle<T>(&self, slice: &mut [T]) {
