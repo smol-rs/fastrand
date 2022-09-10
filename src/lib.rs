@@ -441,6 +441,21 @@ impl Rng {
         }
     }
 
+    /// Fill a byte slice with random data.
+    #[inline]
+    pub fn fill(&self, slice: &mut [u8]) {
+        // Filling the buffer in chunks of 8 is much faster.
+        let mut chunks = slice.chunks_exact_mut(8);
+        for items in chunks.by_ref() {
+            let r = self.u64(..);
+            items.copy_from_slice(&r.to_le_bytes());
+        }
+
+        for item in chunks.into_remainder() {
+            *item = self.u8(..);
+        }
+    }
+
     rng_integer!(
         u8,
         u8,
