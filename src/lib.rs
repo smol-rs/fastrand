@@ -70,6 +70,7 @@
 
 use std::cell::Cell;
 use std::collections::hash_map::DefaultHasher;
+use std::convert::TryInto;
 use std::hash::{Hash, Hasher};
 use std::ops::{Bound, RangeBounds};
 use std::thread;
@@ -442,13 +443,14 @@ impl Rng {
     }
 
     /// Fill a byte slice with random data.
-    #[inline]
     pub fn fill(&self, slice: &mut [u8]) {
         // Filling the buffer in chunks of 8 is much faster.
         let mut chunks = slice.chunks_exact_mut(8);
-        for items in chunks.by_ref() {
-            let r = self.u64(..);
-            items.copy_from_slice(&r.to_le_bytes());
+        for chunk in chunks.by_ref() {
+            let n = self.gen_u64();
+            // Safe because the chunks are always 8 bytes exactly.
+            let bytes: &mut [u8; 8] = chunk.try_into().unwrap();
+            *bytes = n.to_ne_bytes();
         }
 
         for item in chunks.into_remainder() {
@@ -543,7 +545,7 @@ impl Rng {
     /// Panics if the range is empty.
     #[inline]
     pub fn char(&self, range: impl RangeBounds<char>) -> char {
-        use std::convert::{TryFrom, TryInto};
+        use std::convert::TryFrom;
 
         let panic_empty_range = || {
             panic!(
