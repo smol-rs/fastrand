@@ -83,6 +83,19 @@ fn u128() {
 
 #[test]
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+fn fill() {
+    let r = fastrand::Rng::new();
+    let mut a = [0u8; 64];
+    let mut b = [0u8; 64];
+
+    r.fill(&mut a);
+    r.fill(&mut b);
+
+    assert_ne!(a, b);
+}
+
+#[test]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
 fn rng() {
     let r = fastrand::Rng::new();
 
