@@ -113,7 +113,21 @@ impl Clone for Rng {
     /// assert_eq!(rng1.u64(..), rng2.u64(..), "the cloned generators are identical");
     /// ```
     fn clone(&self) -> Rng {
-        Rng::with_seed(self.gen_u64())
+        Rng::with_seed(self.get_seed())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_clone() {
+        let seed = 0x4d595df4d0f33173;
+        let rng1 = crate::Rng::with_seed(seed);
+        let rng2 = rng1.clone();
+        // clone should keep internal state same
+        assert_eq!(rng1.get_seed(), seed);
+        assert_eq!(rng2.get_seed(), seed);
+        assert_eq!(rng1.u64(..), rng2.u64(..));
     }
 }
 
