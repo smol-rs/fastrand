@@ -81,39 +81,13 @@ use instant::Instant;
 use std::time::Instant;
 
 /// A random number generator.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Rng(Cell<u64>);
 
 impl Default for Rng {
     #[inline]
     fn default() -> Rng {
         Rng::new()
-    }
-}
-
-impl Clone for Rng {
-    /// Clones the generator by deterministically deriving a new generator based on the initial
-    /// seed.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// // Seed two generators equally, and clone both of them.
-    /// let base1 = fastrand::Rng::new();
-    /// base1.seed(0x4d595df4d0f33173);
-    /// base1.bool(); // Use the generator once.
-    ///
-    /// let base2 = fastrand::Rng::new();
-    /// base2.seed(0x4d595df4d0f33173);
-    /// base2.bool(); // Use the generator once.
-    ///
-    /// let rng1 = base1.clone();
-    /// let rng2 = base2.clone();
-    ///
-    /// assert_eq!(rng1.u64(..), rng2.u64(..), "the cloned generators are identical");
-    /// ```
-    fn clone(&self) -> Rng {
-        Rng::with_seed(self.gen_u64())
     }
 }
 

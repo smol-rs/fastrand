@@ -118,3 +118,15 @@ fn with_seed() {
     b.seed(7);
     assert_eq!(a.u64(..), b.u64(..));
 }
+
+#[test]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+fn test_clone() {
+    let seed = 0x4d595df4d0f33173;
+    let rng1 = fastrand::Rng::with_seed(seed);
+    let rng2 = rng1.clone();
+    // clone should keep internal state same
+    assert_eq!(rng1.get_seed(), seed);
+    assert_eq!(rng2.get_seed(), seed);
+    assert_eq!(rng1.u64(..), rng2.u64(..));
+}
