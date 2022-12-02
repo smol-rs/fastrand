@@ -1,7 +1,7 @@
-#[cfg(target_family = "wasm")]
+#[cfg(all(target_family = "wasm", not(target_os = "wasi")))]
 use wasm_bindgen_test::wasm_bindgen_test as test;
 
-#[cfg(target_family = "wasm")]
+#[cfg(all(target_family = "wasm", not(target_os = "wasi")))]
 wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
 
 #[test]
