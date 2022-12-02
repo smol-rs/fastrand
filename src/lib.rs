@@ -75,9 +75,9 @@ use std::hash::{Hash, Hasher};
 use std::ops::{Bound, RangeBounds};
 use std::thread;
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(target_arch = "wasm32", not(target_os = "wasi")))]
 use instant::Instant;
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(all(target_arch = "wasm32", not(target_os = "wasi"))))]
 use std::time::Instant;
 
 /// A random number generator.

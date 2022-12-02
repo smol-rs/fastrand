@@ -14,10 +14,10 @@ keywords = ["simple", "fast", "rand", "random", "wyrand"]
 categories = ["algorithms"]
 exclude = ["/.*"]
 
-[target.'cfg(target_arch = "wasm32")'.dependencies]
+[target.'cfg(all(target_arch = "wasm32", not(target_os = "wasi")))'.dependencies]
 instant = "0.1"
 
-[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+[target.'cfg(all(target_arch = "wasm32", not(target_os = "wasi")))'.dev-dependencies]
 instant = { version = "0.1", features = ["wasm-bindgen"] }
 wasm-bindgen-test = "0.3"
 getrandom = { version = "0.2", features = ["js"] }
