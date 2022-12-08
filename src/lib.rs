@@ -64,6 +64,15 @@
 //! let rng = fastrand::Rng::new();
 //! let mut bytes: Vec<u8> = repeat_with(|| rng.u8(..)).take(10_000).collect();
 //! ```
+//!
+//! # Features
+//!
+//! By enabling the `rand_core` feature, the [`Rng`] type implements the [`rand_core::RngCore`]
+//! trait. This allows it to be used with other crates that depend on `rand_core`, such as
+//! [`rand`].
+//!
+//! [`rand`]: https://crates.io/crates/rand
+//! [`rand_core::RngCore`]: https://docs.rs/rand_core/latest/rand_core/trait.RngCore.html
 
 #![forbid(unsafe_code)]
 #![warn(missing_docs, missing_debug_implementations, rust_2018_idioms)]
@@ -599,6 +608,30 @@ impl Rng {
             val += gap;
         }
         val.try_into().unwrap()
+    }
+}
+
+#[cfg(feature = "rand_core")]
+impl rand_core::RngCore for Rng {
+    #[inline]
+    fn next_u32(&mut self) -> u32 {
+        self.gen_u32()
+    }
+
+    #[inline]
+    fn next_u64(&mut self) -> u64 {
+        self.gen_u64()
+    }
+
+    #[inline]
+    fn fill_bytes(&mut self, dest: &mut [u8]) {
+        self.fill(dest)
+    }
+
+    #[inline]
+    fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), rand_core::Error> {
+        self.fill(dest);
+        Ok(())
     }
 }
 

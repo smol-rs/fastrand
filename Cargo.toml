@@ -26,3 +26,6 @@ getrandom = { version = "0.2", features = ["js"] }
 rand = "0.8"
 wyhash = "0.5"
 getrandom = "0.2"
+
+[dependencies]
+rand_core = { version = "0.6.4", default-features = false, optional = true }
