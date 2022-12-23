@@ -443,6 +443,7 @@ impl Rng {
     }
 
     /// Fill a byte slice with random data.
+    #[inline]
     pub fn fill(&self, slice: &mut [u8]) {
         // We fill the slice by chunks of 8 bytes, or one block of
         // WyRand output per new state.
