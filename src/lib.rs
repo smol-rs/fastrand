@@ -166,6 +166,13 @@ impl Rng {
         }
         hi
     }
+
+    /// Generate new Rng
+    #[inline]
+    fn gen_rng(&self) -> Self {
+        let salt = 0x6cc767d3f3b27a72;
+        Rng::with_seed(self.gen_u64() ^ salt)
+    }
 }
 
 thread_local! {
@@ -574,6 +581,14 @@ impl Rng {
         }
         val.try_into().unwrap()
     }
+
+    /// Splits rand number generator into new one.
+    /// Generated Rng is uncorelated with source
+    ///
+    /// To generate same Rng from current one use [`Rng::clone`]
+    pub fn fork(&self) -> Self {
+        self.gen_rng()
+    }
 }
 
 /// Initializes the thread-local generator with the given seed.
@@ -668,4 +683,18 @@ pub fn f32() -> f32 {
 /// Generates a random `f64` in range `0..1`.
 pub fn f64() -> f64 {
     RNG.with(|rng| rng.f64())
+}
+
+/// Generates a local random generator from global
+///
+/// # Examples
+///
+/// ```
+/// use fastrand::rng;
+///
+/// let gen = rng();
+/// let dice = gen.i32(1..=6);
+/// ```
+pub fn rng() -> Rng {
+    RNG.with(|rng| rng.fork())
 }

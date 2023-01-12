@@ -130,3 +130,29 @@ fn test_clone() {
     assert_eq!(rng2.get_seed(), seed);
     assert_eq!(rng1.u64(..), rng2.u64(..));
 }
+
+#[test]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+fn test_fork() {
+    use std::collections::HashSet;
+
+    let mut set = HashSet::<u64>::new();
+    let seed = 0x4d595df4d0f33173;
+    fn check_unique(hs: &mut HashSet<u64>, rng: &fastrand::Rng) {
+        for _ in 0..3 {
+            let r = rng.u64(..);
+            assert!(!hs.contains(&r));
+            hs.insert(r);
+        }
+    }
+    let rg = fastrand::Rng::with_seed(seed);
+    check_unique(&mut set, &rg);
+
+    let g1 = rg.fork();
+    let g2 = rg.fork();
+    let g3 = rg.fork();
+
+    check_unique(&mut set, &g1);
+    check_unique(&mut set, &g2);
+    check_unique(&mut set, &g3);
+}
