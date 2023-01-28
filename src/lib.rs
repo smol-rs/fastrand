@@ -282,6 +282,7 @@ impl Rng {
 
     /// Creates a new random number generator with the initial seed.
     #[inline]
+    #[must_use = "this creates a new instance of `Rng`; if you want to initialize the thread-local generator, use `fastrand::seed()` instead"]
     pub fn with_seed(seed: u64) -> Self {
         let rng = Rng(Cell::new(0));
 
