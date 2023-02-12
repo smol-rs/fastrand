@@ -1,3 +1,8 @@
+# Version 1.9.0
+
+- Add `Rng::fill()` (#35, #43)
+- Add `#[must_use]` to `Rng::with_seed()` (https://github.com/smol-rs/fastrand/commit/8e91b8da49551bf42ca0a50065de046afa3e43a7)
+
 # Version 1.8.0
 
 - Add `get_seed()` and `Rng::get_seed()` (#33)
