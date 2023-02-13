@@ -77,7 +77,7 @@ fn u128() {
 
 #[test]
 fn fill() {
-    let r = fastrand::Rng::new();
+    let mut r = fastrand::Rng::new();
     let mut a = [0u8; 64];
     let mut b = [0u8; 64];
 
@@ -89,7 +89,7 @@ fn fill() {
 
 #[test]
 fn rng() {
-    let r = fastrand::Rng::new();
+    let mut r = fastrand::Rng::new();
 
     assert_ne!(r.u64(..), r.u64(..));
 
@@ -102,8 +102,8 @@ fn rng() {
 
 #[test]
 fn rng_init() {
-    let a = fastrand::Rng::new();
-    let b = fastrand::Rng::new();
+    let mut a = fastrand::Rng::new();
+    let mut b = fastrand::Rng::new();
     assert_ne!(a.u64(..), b.u64(..));
 
     a.seed(7);
@@ -113,8 +113,8 @@ fn rng_init() {
 
 #[test]
 fn with_seed() {
-    let a = fastrand::Rng::with_seed(7);
-    let b = fastrand::Rng::new();
+    let mut a = fastrand::Rng::with_seed(7);
+    let mut b = fastrand::Rng::new();
     b.seed(7);
     assert_eq!(a.u64(..), b.u64(..));
 }

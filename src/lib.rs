@@ -61,7 +61,7 @@
 //! ```
 //! use std::iter::repeat_with;
 //!
-//! let rng = fastrand::Rng::new();
+//! let mut rng = fastrand::Rng::new();
 //! let mut bytes: Vec<u8> = repeat_with(|| rng.u8(..)).take(10_000).collect();
 //! ```
 
@@ -82,7 +82,7 @@ use std::time::Instant;
 
 /// A random number generator.
 #[derive(Debug, PartialEq, Eq)]
-pub struct Rng(Cell<u64>);
+pub struct Rng(u64);
 
 impl Default for Rng {
     #[inline]
@@ -92,56 +92,37 @@ impl Default for Rng {
 }
 
 impl Clone for Rng {
-    /// Clones the generator by deterministically deriving a new generator based on the initial
-    /// seed.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// // Seed two generators equally, and clone both of them.
-    /// let base1 = fastrand::Rng::new();
-    /// base1.seed(0x4d595df4d0f33173);
-    /// base1.bool(); // Use the generator once.
-    ///
-    /// let base2 = fastrand::Rng::new();
-    /// base2.seed(0x4d595df4d0f33173);
-    /// base2.bool(); // Use the generator once.
-    ///
-    /// let rng1 = base1.clone();
-    /// let rng2 = base2.clone();
-    ///
-    /// assert_eq!(rng1.u64(..), rng2.u64(..), "the cloned generators are identical");
-    /// ```
+    /// Clones the generator by creating a new generator with the same seed.
     fn clone(&self) -> Rng {
-        Rng::with_seed(self.gen_u64())
+        Rng::with_seed(self.0)
     }
 }
 
 impl Rng {
     /// Generates a random `u32`.
     #[inline]
-    fn gen_u32(&self) -> u32 {
+    fn gen_u32(&mut self) -> u32 {
         self.gen_u64() as u32
     }
 
     /// Generates a random `u64`.
     #[inline]
-    fn gen_u64(&self) -> u64 {
-        let s = self.0.get().wrapping_add(0xA0761D6478BD642F);
-        self.0.set(s);
+    fn gen_u64(&mut self) -> u64 {
+        let s = self.0.wrapping_add(0xA0761D6478BD642F);
+        self.0 = s;
         let t = u128::from(s) * u128::from(s ^ 0xE7037ED1A0B428DB);
         (t as u64) ^ (t >> 64) as u64
     }
 
     /// Generates a random `u128`.
     #[inline]
-    fn gen_u128(&self) -> u128 {
+    fn gen_u128(&mut self) -> u128 {
         (u128::from(self.gen_u64()) << 64) | u128::from(self.gen_u64())
     }
 
     /// Generates a random `u32` in `0..n`.
     #[inline]
-    fn gen_mod_u32(&self, n: u32) -> u32 {
+    fn gen_mod_u32(&mut self, n: u32) -> u32 {
         // Adapted from: https://lemire.me/blog/2016/06/30/fast-random-shuffling/
         let mut r = self.gen_u32();
         let mut hi = mul_high_u32(r, n);
@@ -159,7 +140,7 @@ impl Rng {
 
     /// Generates a random `u64` in `0..n`.
     #[inline]
-    fn gen_mod_u64(&self, n: u64) -> u64 {
+    fn gen_mod_u64(&mut self, n: u64) -> u64 {
         // Adapted from: https://lemire.me/blog/2016/06/30/fast-random-shuffling/
         let mut r = self.gen_u64();
         let mut hi = mul_high_u64(r, n);
@@ -177,7 +158,7 @@ impl Rng {
 
     /// Generates a random `u128` in `0..n`.
     #[inline]
-    fn gen_mod_u128(&self, n: u128) -> u128 {
+    fn gen_mod_u128(&mut self, n: u128) -> u128 {
         // Adapted from: https://lemire.me/blog/2016/06/30/fast-random-shuffling/
         let mut r = self.gen_u128();
         let mut hi = mul_high_u128(r, n);
@@ -195,7 +176,7 @@ impl Rng {
 }
 
 thread_local! {
-    static RNG: Rng = Rng(Cell::new({
+    static RNG: Cell<Rng> = Cell::new(Rng({
         let mut hasher = DefaultHasher::new();
         Instant::now().hash(&mut hasher);
         thread::current().id().hash(&mut hasher);
@@ -235,7 +216,7 @@ macro_rules! rng_integer {
         ///
         /// Panics if the range is empty.
         #[inline]
-        pub fn $t(&self, range: impl RangeBounds<$t>) -> $t {
+        pub fn $t(&mut self, range: impl RangeBounds<$t>) -> $t {
             let panic_empty_range = || {
                 panic!(
                     "empty range: {:?}..{:?}",
@@ -274,17 +255,22 @@ impl Rng {
     /// Creates a new random number generator.
     #[inline]
     pub fn new() -> Rng {
-        Rng::with_seed(
-            RNG.try_with(|rng| rng.u64(..))
-                .unwrap_or(0x4d595df4d0f33173),
-        )
+        Rng::with_seed({
+            RNG.try_with(|rng| {
+                let current = rng.replace(Rng(0));
+                let mut restore = RestoreOnDrop { rng, current };
+
+                restore.current.gen_u64()
+            })
+            .unwrap_or(0x4d595df4d0f33173)
+        })
     }
 
     /// Creates a new random number generator with the initial seed.
     #[inline]
     #[must_use = "this creates a new instance of `Rng`; if you want to initialize the thread-local generator, use `fastrand::seed()` instead"]
     pub fn with_seed(seed: u64) -> Self {
-        let rng = Rng(Cell::new(0));
+        let mut rng = Rng(0);
 
         rng.seed(seed);
         rng
@@ -292,7 +278,7 @@ impl Rng {
 
     /// Generates a random `char` in ranges a-z and A-Z.
     #[inline]
-    pub fn alphabetic(&self) -> char {
+    pub fn alphabetic(&mut self) -> char {
         const CHARS: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         let len = CHARS.len() as u8;
         let i = self.u8(..len);
@@ -301,7 +287,7 @@ impl Rng {
 
     /// Generates a random `char` in ranges a-z, A-Z and 0-9.
     #[inline]
-    pub fn alphanumeric(&self) -> char {
+    pub fn alphanumeric(&mut self) -> char {
         const CHARS: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         let len = CHARS.len() as u8;
         let i = self.u8(..len);
@@ -310,7 +296,7 @@ impl Rng {
 
     /// Generates a random `bool`.
     #[inline]
-    pub fn bool(&self) -> bool {
+    pub fn bool(&mut self) -> bool {
         self.u8(..) % 2 == 0
     }
 
@@ -320,7 +306,7 @@ impl Rng {
     ///
     /// Panics if the base is zero or greater than 36.
     #[inline]
-    pub fn digit(&self, base: u32) -> char {
+    pub fn digit(&mut self, base: u32) -> char {
         if base == 0 {
             panic!("base cannot be zero");
         }
@@ -336,14 +322,14 @@ impl Rng {
     }
 
     /// Generates a random `f32` in range `0..1`.
-    pub fn f32(&self) -> f32 {
+    pub fn f32(&mut self) -> f32 {
         let b = 32;
         let f = std::f32::MANTISSA_DIGITS - 1;
         f32::from_bits((1 << (b - 2)) - (1 << f) + (self.u32(..) >> (b - f))) - 1.0
     }
 
     /// Generates a random `f64` in range `0..1`.
-    pub fn f64(&self) -> f64 {
+    pub fn f64(&mut self) -> f64 {
         let b = 64;
         let f = std::f64::MANTISSA_DIGITS - 1;
         f64::from_bits((1 << (b - 2)) - (1 << f) + (self.u64(..) >> (b - f))) - 1.0
@@ -416,7 +402,7 @@ impl Rng {
 
     /// Generates a random `char` in range a-z.
     #[inline]
-    pub fn lowercase(&self) -> char {
+    pub fn lowercase(&mut self) -> char {
         const CHARS: &[u8] = b"abcdefghijklmnopqrstuvwxyz";
         let len = CHARS.len() as u8;
         let i = self.u8(..len);
@@ -425,19 +411,19 @@ impl Rng {
 
     /// Initializes this generator with the given seed.
     #[inline]
-    pub fn seed(&self, seed: u64) {
-        self.0.set(seed);
+    pub fn seed(&mut self, seed: u64) {
+        self.0 = seed;
     }
 
     /// Gives back **current** seed that is being held by this generator.
     #[inline]
     pub fn get_seed(&self) -> u64 {
-        self.0.get()
+        self.0
     }
 
     /// Shuffles a slice randomly.
     #[inline]
-    pub fn shuffle<T>(&self, slice: &mut [T]) {
+    pub fn shuffle<T>(&mut self, slice: &mut [T]) {
         for i in 1..slice.len() {
             slice.swap(i, self.usize(..=i));
         }
@@ -445,7 +431,7 @@ impl Rng {
 
     /// Fill a byte slice with random data.
     #[inline]
-    pub fn fill(&self, slice: &mut [u8]) {
+    pub fn fill(&mut self, slice: &mut [u8]) {
         // We fill the slice by chunks of 8 bytes, or one block of
         // WyRand output per new state.
         let mut chunks = slice.chunks_exact_mut(core::mem::size_of::<u64>());
@@ -542,7 +528,7 @@ impl Rng {
 
     /// Generates a random `char` in range A-Z.
     #[inline]
-    pub fn uppercase(&self) -> char {
+    pub fn uppercase(&mut self) -> char {
         const CHARS: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         let len = CHARS.len() as u8;
         let i = self.u8(..len);
@@ -553,7 +539,7 @@ impl Rng {
     ///
     /// Panics if the range is empty.
     #[inline]
-    pub fn char(&self, range: impl RangeBounds<char>) -> char {
+    pub fn char(&mut self, range: impl RangeBounds<char>) -> char {
         use std::convert::TryFrom;
 
         let panic_empty_range = || {
@@ -611,46 +597,70 @@ impl Rng {
     }
 }
 
+/// Run an operation with the current thread-local generator.
+#[inline]
+fn with_rng<R>(f: impl FnOnce(&mut Rng) -> R) -> R {
+    RNG.with(|rng| {
+        let current = rng.replace(Rng(0));
+
+        let mut restore = RestoreOnDrop { rng, current };
+
+        f(&mut restore.current)
+    })
+}
+
+/// Make sure the original RNG is restored even on panic.
+struct RestoreOnDrop<'a> {
+    rng: &'a Cell<Rng>,
+    current: Rng,
+}
+
+impl Drop for RestoreOnDrop<'_> {
+    fn drop(&mut self) {
+        self.rng.set(Rng(self.current.0));
+    }
+}
+
 /// Initializes the thread-local generator with the given seed.
 #[inline]
 pub fn seed(seed: u64) {
-    RNG.with(|rng| rng.seed(seed))
+    with_rng(|r| r.seed(seed));
 }
 
 /// Gives back **current** seed that is being held by the thread-local generator.
 #[inline]
 pub fn get_seed() -> u64 {
-    RNG.with(|rng| rng.get_seed())
+    with_rng(|r| r.get_seed())
 }
 
 /// Generates a random `bool`.
 #[inline]
 pub fn bool() -> bool {
-    RNG.with(|rng| rng.bool())
+    with_rng(|r| r.bool())
 }
 
 /// Generates a random `char` in ranges a-z and A-Z.
 #[inline]
 pub fn alphabetic() -> char {
-    RNG.with(|rng| rng.alphabetic())
+    with_rng(|r| r.alphabetic())
 }
 
 /// Generates a random `char` in ranges a-z, A-Z and 0-9.
 #[inline]
 pub fn alphanumeric() -> char {
-    RNG.with(|rng| rng.alphanumeric())
+    with_rng(|r| r.alphanumeric())
 }
 
 /// Generates a random `char` in range a-z.
 #[inline]
 pub fn lowercase() -> char {
-    RNG.with(|rng| rng.lowercase())
+    with_rng(|r| r.lowercase())
 }
 
 /// Generates a random `char` in range A-Z.
 #[inline]
 pub fn uppercase() -> char {
-    RNG.with(|rng| rng.uppercase())
+    with_rng(|r| r.uppercase())
 }
 
 /// Generates a random digit in the given `base`.
@@ -660,13 +670,13 @@ pub fn uppercase() -> char {
 /// Panics if the base is zero or greater than 36.
 #[inline]
 pub fn digit(base: u32) -> char {
-    RNG.with(|rng| rng.digit(base))
+    with_rng(|r| r.digit(base))
 }
 
 /// Shuffles a slice randomly.
 #[inline]
 pub fn shuffle<T>(slice: &mut [T]) {
-    RNG.with(|rng| rng.shuffle(slice))
+    with_rng(|r| r.shuffle(slice))
 }
 
 macro_rules! integer {
@@ -676,7 +686,7 @@ macro_rules! integer {
         /// Panics if the range is empty.
         #[inline]
         pub fn $t(range: impl RangeBounds<$t>) -> $t {
-            RNG.with(|rng| rng.$t(range))
+            with_rng(|r| r.$t(range))
         }
     };
 }
@@ -697,10 +707,10 @@ integer!(char, "Generates a random `char` in the given range.");
 
 /// Generates a random `f32` in range `0..1`.
 pub fn f32() -> f32 {
-    RNG.with(|rng| rng.f32())
+    with_rng(|r| r.f32())
 }
 
 /// Generates a random `f64` in range `0..1`.
 pub fn f64() -> f64 {
-    RNG.with(|rng| rng.f64())
+    with_rng(|r| r.f64())
 }
