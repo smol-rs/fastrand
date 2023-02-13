@@ -48,6 +48,8 @@ jobs:
         if: startsWith(matrix.rust, 'nightly')
         run: cargo check -Z features=dev_dep
       - run: cargo test
+      - name: Build with no default features
+        run: cargo build --no-default-features
       - name: Test wasm
         run: wasm-pack test --headless --chrome
         if: startsWith(matrix.os, 'ubuntu')

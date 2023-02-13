@@ -14,6 +14,10 @@ keywords = ["simple", "fast", "rand", "random", "wyrand"]
 categories = ["algorithms"]
 exclude = ["/.*"]
 
+[features]
+default = ["std"]
+std = []
+
 [target.'cfg(all(target_arch = "wasm32", not(target_os = "wasi")))'.dependencies]
 instant = "0.1"
 
