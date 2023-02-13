@@ -255,7 +255,7 @@ impl Rng {
     /// Creates a new random number generator.
     #[inline]
     pub fn new() -> Rng {
-        try_with_rng(|rng| rng.fork()).unwrap_or_else(|_| Rng::with_seed(0x4d595df4d0f33173))
+        try_with_rng(Rng::fork).unwrap_or_else(|_| Rng::with_seed(0x4d595df4d0f33173))
     }
 
     /// Creates a new random number generator with the initial seed.
@@ -275,16 +275,16 @@ impl Rng {
     ///
     /// ```
     /// // Seed two generators equally, and clone both of them.
-    /// let base1 = fastrand::Rng::new();
+    /// let mut base1 = fastrand::Rng::new();
     /// base1.seed(0x4d595df4d0f33173);
     /// base1.bool(); // Use the generator once.
     ///
-    /// let base2 = fastrand::Rng::new();
+    /// let mut base2 = fastrand::Rng::new();
     /// base2.seed(0x4d595df4d0f33173);
     /// base2.bool(); // Use the generator once.
     ///
-    /// let rng1 = base1.clone();
-    /// let rng2 = base2.clone();
+    /// let mut rng1 = base1.clone();
+    /// let mut rng2 = base2.clone();
     ///
     /// assert_eq!(rng1.u64(..), rng2.u64(..), "the cloned generators are identical");
     /// ```
