@@ -255,15 +255,7 @@ impl Rng {
     /// Creates a new random number generator.
     #[inline]
     pub fn new() -> Rng {
-        Rng::with_seed({
-            RNG.try_with(|rng| {
-                let current = rng.replace(Rng(0));
-                let mut restore = RestoreOnDrop { rng, current };
-
-                restore.current.gen_u64()
-            })
-            .unwrap_or(0x4d595df4d0f33173)
-        })
+        try_with_rng(|rng| rng.fork()).unwrap_or_else(|_| Rng::with_seed(0x4d595df4d0f33173))
     }
 
     /// Creates a new random number generator with the initial seed.
@@ -274,6 +266,32 @@ impl Rng {
 
         rng.seed(seed);
         rng
+    }
+
+    /// Clones the generator by deterministically deriving a new generator based on the initial
+    /// seed.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// // Seed two generators equally, and clone both of them.
+    /// let base1 = fastrand::Rng::new();
+    /// base1.seed(0x4d595df4d0f33173);
+    /// base1.bool(); // Use the generator once.
+    ///
+    /// let base2 = fastrand::Rng::new();
+    /// base2.seed(0x4d595df4d0f33173);
+    /// base2.bool(); // Use the generator once.
+    ///
+    /// let rng1 = base1.clone();
+    /// let rng2 = base2.clone();
+    ///
+    /// assert_eq!(rng1.u64(..), rng2.u64(..), "the cloned generators are identical");
+    /// ```
+    #[inline]
+    #[must_use = "this creates a new instance of `Rng`"]
+    pub fn fork(&mut self) -> Self {
+        Rng::with_seed(self.gen_u64())
     }
 
     /// Generates a random `char` in ranges a-z and A-Z.
@@ -601,6 +619,18 @@ impl Rng {
 #[inline]
 fn with_rng<R>(f: impl FnOnce(&mut Rng) -> R) -> R {
     RNG.with(|rng| {
+        let current = rng.replace(Rng(0));
+
+        let mut restore = RestoreOnDrop { rng, current };
+
+        f(&mut restore.current)
+    })
+}
+
+/// Try to run an operation with the current thread-local generator.
+#[inline]
+fn try_with_rng<R>(f: impl FnOnce(&mut Rng) -> R) -> Result<R, std::thread::AccessError> {
+    RNG.try_with(|rng| {
         let current = rng.replace(Rng(0));
 
         let mut restore = RestoreOnDrop { rng, current };
