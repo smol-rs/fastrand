@@ -347,7 +347,7 @@ impl Rng {
     /// elements available.
     ///
     /// Complexity is `O(n)` where `n` is the length of the iterator.
-    pub fn choose_multiple<T: std::iter::Iterator + Sized>(
+    pub fn choose_multiple<T: std::iter::Iterator>(
         &self,
         mut source: T,
         amount: usize,
