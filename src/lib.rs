@@ -362,7 +362,7 @@ impl Rng {
     /// elements available.
     ///
     /// Complexity is `O(n)` where `n` is the length of the iterator.
-    pub fn choose_multiple<T: std::iter::Iterator + Sized>(
+    pub fn choose_multiple<T: std::iter::Iterator>(
         &self,
         mut source: T,
         amount: usize,
@@ -713,6 +713,6 @@ pub fn f64() -> f64 {
 }
 
 /// Collects `amount` values at random from the iterator into a vector.
-pub fn choose_multiple<T: std::iter::Iterator + Sized>(source: T, amount: usize) -> Vec<T::Item> {
+pub fn choose_multiple<T: std::iter::Iterator>(source: T, amount: usize) -> Vec<T::Item> {
     RNG.with(|rng| rng.choose_multiple(source, amount))
 }
