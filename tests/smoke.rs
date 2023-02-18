@@ -118,3 +118,13 @@ fn with_seed() {
     b.seed(7);
     assert_eq!(a.u64(..), b.u64(..));
 }
+
+#[test]
+fn choice() {
+    let items = [1, 4, 9, 5, 2, 3, 6, 7, 8, 0];
+    let mut r = fastrand::Rng::new();
+
+    for item in &items {
+        while r.choice(&items).unwrap() != item {}
+    }
+}

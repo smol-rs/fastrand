@@ -279,18 +279,14 @@ impl Rng {
     #[inline]
     pub fn alphabetic(&mut self) -> char {
         const CHARS: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        let len = CHARS.len() as u8;
-        let i = self.u8(..len);
-        CHARS[i as usize] as char
+        *self.choice(CHARS).unwrap() as char
     }
 
     /// Generates a random `char` in ranges a-z, A-Z and 0-9.
     #[inline]
     pub fn alphanumeric(&mut self) -> char {
         const CHARS: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let len = CHARS.len() as u8;
-        let i = self.u8(..len);
-        CHARS[i as usize] as char
+        *self.choice(CHARS).unwrap() as char
     }
 
     /// Generates a random `bool`.
@@ -403,9 +399,7 @@ impl Rng {
     #[inline]
     pub fn lowercase(&mut self) -> char {
         const CHARS: &[u8] = b"abcdefghijklmnopqrstuvwxyz";
-        let len = CHARS.len() as u8;
-        let i = self.u8(..len);
-        CHARS[i as usize] as char
+        *self.choice(CHARS).unwrap() as char
     }
 
     /// Initializes this generator with the given seed.
@@ -418,6 +412,29 @@ impl Rng {
     #[inline]
     pub fn get_seed(&self) -> u64 {
         self.0
+    }
+
+    /// Choose an item from an iterator at random.
+    ///
+    /// This function may have an unexpected result if the `len()` property of the
+    /// iterator does not match the actual number of items in the iterator. If
+    /// the iterator is empty, this returns `None`.
+    #[inline]
+    pub fn choice<I>(&mut self, iter: I) -> Option<I::Item>
+    where
+        I: IntoIterator,
+        I::IntoIter: ExactSizeIterator,
+    {
+        let mut iter = iter.into_iter();
+
+        // Get the item at a random index.
+        let len = iter.len();
+        if len == 0 {
+            return None;
+        }
+        let index = self.usize(0..len);
+
+        iter.nth(index)
     }
 
     /// Shuffles a slice randomly.
@@ -529,9 +546,7 @@ impl Rng {
     #[inline]
     pub fn uppercase(&mut self) -> char {
         const CHARS: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        let len = CHARS.len() as u8;
-        let i = self.u8(..len);
-        CHARS[i as usize] as char
+        *self.choice(CHARS).unwrap() as char
     }
 
     /// Generates a random `char` in the given range.
