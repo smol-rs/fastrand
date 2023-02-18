@@ -64,9 +64,9 @@
 //! let mut rng = fastrand::Rng::new();
 //! let mut bytes: Vec<u8> = repeat_with(|| rng.u8(..)).take(10_000).collect();
 //! ```
-//! 
+//!
 //! # Features
-//! 
+//!
 //! - `std` (enabled by default): Enables the `std` library. This is required for the global
 //!   generator and global entropy. Without this feature, [`Rng`] can only be instantiated using
 //!   the [`with_seed`](Rng::with_seed) method.
@@ -79,30 +79,14 @@ use core::convert::{TryFrom, TryInto};
 use core::ops::{Bound, RangeBounds};
 
 #[cfg(feature = "std")]
-use std::cell::Cell;
-#[cfg(feature = "std")]
-use std::collections::hash_map::DefaultHasher;
-#[cfg(feature = "std")]
-use std::hash::{Hash, Hasher};
-#[cfg(feature = "std")]
-use std::thread;
+mod global_rng;
 
-#[cfg(all(feature = "std", target_arch = "wasm32", not(target_os = "wasi")))]
-use instant::Instant;
-#[cfg(all(feature = "std", not(all(target_arch = "wasm32", not(target_os = "wasi")))))]
-use std::time::Instant;
+#[cfg(feature = "std")]
+pub use global_rng::*;
 
 /// A random number generator.
 #[derive(Debug, PartialEq, Eq)]
 pub struct Rng(u64);
-
-#[cfg(feature = "std")]
-impl Default for Rng {
-    #[inline]
-    fn default() -> Rng {
-        Rng::new()
-    }
-}
 
 impl Clone for Rng {
     /// Clones the generator by creating a new generator with the same seed.
@@ -188,17 +172,6 @@ impl Rng {
     }
 }
 
-#[cfg(feature = "std")]
-thread_local! {
-    static RNG: Cell<Rng> = Cell::new(Rng({
-        let mut hasher = DefaultHasher::new();
-        Instant::now().hash(&mut hasher);
-        thread::current().id().hash(&mut hasher);
-        let hash = hasher.finish();
-        (hash << 1) | 1
-    }));
-}
-
 /// Computes `(a * b) >> 32`.
 #[inline]
 fn mul_high_u32(a: u32, b: u32) -> u32 {
@@ -266,13 +239,6 @@ macro_rules! rng_integer {
 }
 
 impl Rng {
-    /// Creates a new random number generator.
-    #[cfg(feature = "std")]
-    #[inline]
-    pub fn new() -> Rng {
-        try_with_rng(Rng::fork).unwrap_or_else(|_| Rng::with_seed(0x4d595df4d0f33173))
-    }
-
     /// Creates a new random number generator with the initial seed.
     #[inline]
     #[must_use = "this creates a new instance of `Rng`; if you want to initialize the thread-local generator, use `fastrand::seed()` instead"]
@@ -626,149 +592,4 @@ impl Rng {
         }
         val.try_into().unwrap()
     }
-}
-
-/// Run an operation with the current thread-local generator.
-#[cfg(feature = "std")]
-#[inline]
-fn with_rng<R>(f: impl FnOnce(&mut Rng) -> R) -> R {
-    RNG.with(|rng| {
-        let current = rng.replace(Rng(0));
-
-        let mut restore = RestoreOnDrop { rng, current };
-
-        f(&mut restore.current)
-    })
-}
-
-/// Try to run an operation with the current thread-local generator.
-#[inline]
-fn try_with_rng<R>(f: impl FnOnce(&mut Rng) -> R) -> Result<R, std::thread::AccessError> {
-    RNG.try_with(|rng| {
-        let current = rng.replace(Rng(0));
-
-        let mut restore = RestoreOnDrop { rng, current };
-
-        f(&mut restore.current)
-    })
-}
-
-/// Make sure the original RNG is restored even on panic.
-#[cfg(feature = "std")]
-struct RestoreOnDrop<'a> {
-    rng: &'a Cell<Rng>,
-    current: Rng,
-}
-
-#[cfg(feature = "std")]
-impl Drop for RestoreOnDrop<'_> {
-    fn drop(&mut self) {
-        self.rng.set(Rng(self.current.0));
-    }
-}
-
-/// Initializes the thread-local generator with the given seed.
-#[cfg(feature = "std")]
-#[inline]
-pub fn seed(seed: u64) {
-    with_rng(|r| r.seed(seed));
-}
-
-/// Gives back **current** seed that is being held by the thread-local generator.
-#[cfg(feature = "std")]
-#[inline]
-pub fn get_seed() -> u64 {
-    with_rng(|r| r.get_seed())
-}
-
-/// Generates a random `bool`.
-#[cfg(feature = "std")]
-#[inline]
-pub fn bool() -> bool {
-    with_rng(|r| r.bool())
-}
-
-/// Generates a random `char` in ranges a-z and A-Z.
-#[cfg(feature = "std")]
-#[inline]
-pub fn alphabetic() -> char {
-    with_rng(|r| r.alphabetic())
-}
-
-/// Generates a random `char` in ranges a-z, A-Z and 0-9.
-#[cfg(feature = "std")]
-#[inline]
-pub fn alphanumeric() -> char {
-    with_rng(|r| r.alphanumeric())
-}
-
-/// Generates a random `char` in range a-z.
-#[cfg(feature = "std")]
-#[inline]
-pub fn lowercase() -> char {
-    with_rng(|r| r.lowercase())
-}
-
-/// Generates a random `char` in range A-Z.
-#[cfg(feature = "std")]
-#[inline]
-pub fn uppercase() -> char {
-    with_rng(|r| r.uppercase())
-}
-
-/// Generates a random digit in the given `base`.
-///
-/// Digits are represented by `char`s in ranges 0-9 and a-z.
-///
-/// Panics if the base is zero or greater than 36.
-#[cfg(feature = "std")]
-#[inline]
-pub fn digit(base: u32) -> char {
-    with_rng(|r| r.digit(base))
-}
-
-/// Shuffles a slice randomly.
-#[cfg(feature = "std")]
-#[inline]
-pub fn shuffle<T>(slice: &mut [T]) {
-    with_rng(|r| r.shuffle(slice))
-}
-
-macro_rules! integer {
-    ($t:tt, $doc:tt) => {
-        #[doc = $doc]
-        ///
-        /// Panics if the range is empty.
-        #[cfg(feature = "std")]
-        #[inline]
-        pub fn $t(range: impl RangeBounds<$t>) -> $t {
-            with_rng(|r| r.$t(range))
-        }
-    };
-}
-
-integer!(u8, "Generates a random `u8` in the given range.");
-integer!(i8, "Generates a random `i8` in the given range.");
-integer!(u16, "Generates a random `u16` in the given range.");
-integer!(i16, "Generates a random `i16` in the given range.");
-integer!(u32, "Generates a random `u32` in the given range.");
-integer!(i32, "Generates a random `i32` in the given range.");
-integer!(u64, "Generates a random `u64` in the given range.");
-integer!(i64, "Generates a random `i64` in the given range.");
-integer!(u128, "Generates a random `u128` in the given range.");
-integer!(i128, "Generates a random `i128` in the given range.");
-integer!(usize, "Generates a random `usize` in the given range.");
-integer!(isize, "Generates a random `isize` in the given range.");
-integer!(char, "Generates a random `char` in the given range.");
-
-/// Generates a random `f32` in range `0..1`.
-#[cfg(feature = "std")]
-pub fn f32() -> f32 {
-    with_rng(|r| r.f32())
-}
-
-/// Generates a random `f64` in range `0..1`.
-#[cfg(feature = "std")]
-pub fn f64() -> f64 {
-    with_rng(|r| r.f64())
 }
