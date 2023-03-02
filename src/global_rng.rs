@@ -120,6 +120,20 @@ pub fn uppercase() -> char {
     with_rng(|r| r.uppercase())
 }
 
+/// Choose an item from an iterator at random.
+///
+/// This function may have an unexpected result if the `len()` property of the
+/// iterator does not match the actual number of items in the iterator. If
+/// the iterator is empty, this returns `None`.
+#[inline]
+pub fn choice<I>(iter: I) -> Option<I::Item>
+where
+    I: IntoIterator,
+    I::IntoIter: ExactSizeIterator,
+{
+    with_rng(|r| r.choice(iter))
+}
+
 /// Generates a random digit in the given `base`.
 ///
 /// Digits are represented by `char`s in ranges 0-9 and a-z.
