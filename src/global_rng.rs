@@ -10,12 +10,10 @@ use instant::Instant;
 #[cfg(not(all(target_arch = "wasm32", not(target_os = "wasi"))))]
 use std::time::Instant;
 
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl Default for Rng {
     /// Initialize the `Rng` from the system's random number generator.
     ///
     /// This is equivalent to [`Rng::new()`].
-    #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
     #[inline]
     fn default() -> Rng {
         Rng::new()
@@ -24,7 +22,6 @@ impl Default for Rng {
 
 impl Rng {
     /// Creates a new random number generator.
-    #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
     #[inline]
     pub fn new() -> Rng {
         try_with_rng(Rng::fork).unwrap_or_else(|_| Rng::with_seed(0x4d595df4d0f33173))
@@ -82,49 +79,42 @@ impl Drop for RestoreOnDrop<'_> {
 }
 
 /// Initializes the thread-local generator with the given seed.
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 #[inline]
 pub fn seed(seed: u64) {
     with_rng(|r| r.seed(seed));
 }
 
 /// Gives back **current** seed that is being held by the thread-local generator.
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 #[inline]
 pub fn get_seed() -> u64 {
     with_rng(|r| r.get_seed())
 }
 
 /// Generates a random `bool`.
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 #[inline]
 pub fn bool() -> bool {
     with_rng(|r| r.bool())
 }
 
 /// Generates a random `char` in ranges a-z and A-Z.
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 #[inline]
 pub fn alphabetic() -> char {
     with_rng(|r| r.alphabetic())
 }
 
 /// Generates a random `char` in ranges a-z, A-Z and 0-9.
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 #[inline]
 pub fn alphanumeric() -> char {
     with_rng(|r| r.alphanumeric())
 }
 
 /// Generates a random `char` in range a-z.
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 #[inline]
 pub fn lowercase() -> char {
     with_rng(|r| r.lowercase())
 }
 
 /// Generates a random `char` in range A-Z.
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 #[inline]
 pub fn uppercase() -> char {
     with_rng(|r| r.uppercase())
@@ -135,7 +125,6 @@ pub fn uppercase() -> char {
 /// This function may have an unexpected result if the `len()` property of the
 /// iterator does not match the actual number of items in the iterator. If
 /// the iterator is empty, this returns `None`.
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 #[inline]
 pub fn choice<I>(iter: I) -> Option<I::Item>
 where
@@ -150,14 +139,12 @@ where
 /// Digits are represented by `char`s in ranges 0-9 and a-z.
 ///
 /// Panics if the base is zero or greater than 36.
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 #[inline]
 pub fn digit(base: u32) -> char {
     with_rng(|r| r.digit(base))
 }
 
 /// Shuffles a slice randomly.
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 #[inline]
 pub fn shuffle<T>(slice: &mut [T]) {
     with_rng(|r| r.shuffle(slice))
@@ -167,8 +154,7 @@ macro_rules! integer {
     ($t:tt, $doc:tt) => {
         #[doc = $doc]
         ///
-        /// Panics if the range is empty.
-        #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+        /// Panics if the range is empty.     
         #[inline]
         pub fn $t(range: impl RangeBounds<$t>) -> $t {
             with_rng(|r| r.$t(range))
@@ -191,13 +177,11 @@ integer!(isize, "Generates a random `isize` in the given range.");
 integer!(char, "Generates a random `char` in the given range.");
 
 /// Generates a random `f32` in range `0..1`.
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 pub fn f32() -> f32 {
     with_rng(|r| r.f32())
 }
 
 /// Generates a random `f64` in range `0..1`.
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 pub fn f64() -> f64 {
     with_rng(|r| r.f64())
 }

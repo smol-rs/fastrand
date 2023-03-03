@@ -80,6 +80,7 @@ use core::convert::{TryFrom, TryInto};
 use core::ops::{Bound, RangeBounds};
 
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 mod global_rng;
 
 #[cfg(feature = "std")]
