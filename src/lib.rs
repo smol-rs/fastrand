@@ -72,6 +72,7 @@
 //!   the [`with_seed`](Rng::with_seed) method.
 
 #![cfg_attr(not(feature = "std"), no_std)]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 #![forbid(unsafe_code)]
 #![warn(missing_docs, missing_debug_implementations, rust_2018_idioms)]
 
@@ -79,6 +80,7 @@ use core::convert::{TryFrom, TryInto};
 use core::ops::{Bound, RangeBounds};
 
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 mod global_rng;
 
 #[cfg(feature = "std")]

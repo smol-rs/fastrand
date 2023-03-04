@@ -30,3 +30,7 @@ getrandom = { version = "0.2", features = ["js"] }
 rand = "0.8"
 wyhash = "0.5"
 getrandom = "0.2"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
