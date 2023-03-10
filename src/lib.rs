@@ -84,8 +84,14 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs, missing_debug_implementations, rust_2018_idioms)]
 
+#[cfg(feature = "alloc")]
+extern crate alloc;
+
 use core::convert::{TryFrom, TryInto};
 use core::ops::{Bound, RangeBounds};
+
+#[cfg(feature = "alloc")]
+use alloc::vec::Vec;
 
 #[cfg(feature = "std")]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
@@ -347,11 +353,9 @@ impl Rng {
     /// elements available.
     ///
     /// Complexity is `O(n)` where `n` is the length of the iterator.
-    pub fn choose_multiple<T: std::iter::Iterator>(
-        &self,
-        mut source: T,
-        amount: usize,
-    ) -> Vec<T::Item> {
+    #[cfg(feature = "alloc")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "alloc")))]
+    pub fn choose_multiple<T: Iterator>(&mut self, mut source: T, amount: usize) -> Vec<T::Item> {
         // Adapted from: https://docs.rs/rand/latest/rand/seq/trait.IteratorRandom.html#method.choose_multiple
         let mut reservoir = Vec::with_capacity(amount);
 
@@ -370,9 +374,12 @@ impl Rng {
                 }
             }
         } else {
-            // Don't hang onto extra memory. There is a corner case where
-            // `amount` was much less than `self.len()`.
-            reservoir.shrink_to_fit();
+            // If less than one third of the `Vec` was used, reallocate
+            // so that the unused space is not wasted. There is a corner
+            // case where `amount` was much less than `self.len()`.
+            if reservoir.capacity() > 3 * reservoir.len() {
+                reservoir.shrink_to_fit();
+            }
         }
         reservoir
     }

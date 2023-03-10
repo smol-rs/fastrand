@@ -16,7 +16,8 @@ exclude = ["/.*"]
 
 [features]
 default = ["std"]
-std = ["instant"]
+alloc = []
+std = ["alloc", "instant"]
 
 [target.'cfg(all(target_arch = "wasm32", not(target_os = "wasi")))'.dependencies]
 instant = { version = "0.1", optional = true }

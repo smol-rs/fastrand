@@ -185,3 +185,8 @@ pub fn f32() -> f32 {
 pub fn f64() -> f64 {
     with_rng(|r| r.f64())
 }
+
+/// Collects `amount` values at random from the iterator into a vector.
+pub fn choose_multiple<T: Iterator>(source: T, amount: usize) -> Vec<T::Item> {
+    with_rng(|rng| rng.choose_multiple(source, amount))
+}
