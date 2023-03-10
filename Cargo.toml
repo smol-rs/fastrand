@@ -6,7 +6,7 @@ name = "fastrand"
 version = "1.9.0"
 authors = ["Stjepan Glavina <stjepang@gmail.com>"]
 edition = "2018"
-rust-version = "1.34"
+rust-version = "1.36"
 description = "A simple and fast random number generator"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/smol-rs/fastrand"
@@ -31,6 +31,9 @@ getrandom = { version = "0.2", features = ["js"] }
 rand = "0.8"
 wyhash = "0.5"
 getrandom = "0.2"
+
+[build-dependencies]
+autocfg = "1.1.0"
 
 [package.metadata.docs.rs]
 all-features = true

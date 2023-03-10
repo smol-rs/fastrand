@@ -84,8 +84,10 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs, missing_debug_implementations, rust_2018_idioms)]
 
-#[cfg(feature = "alloc")]
+#[cfg(all(feature = "alloc", not(feature = "std")))]
 extern crate alloc;
+#[cfg(feature = "std")]
+use std as alloc;
 
 use core::convert::{TryFrom, TryInto};
 use core::ops::{Bound, RangeBounds};
