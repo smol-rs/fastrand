@@ -32,9 +32,6 @@ rand = "0.8"
 wyhash = "0.5"
 getrandom = "0.2"
 
-[build-dependencies]
-autocfg = "1.1.0"
-
 [package.metadata.docs.rs]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
