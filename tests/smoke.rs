@@ -120,6 +120,19 @@ fn with_seed() {
 }
 
 #[test]
+fn choose_multiple() {
+    let mut a = fastrand::Rng::new();
+    let mut elements = (0..20).collect::<Vec<_>>();
+
+    while !elements.is_empty() {
+        let chosen = a.choose_multiple(0..20, 5);
+        for &x in &chosen {
+            elements.retain(|&y| y != x);
+        }
+    }
+}
+
+#[test]
 fn choice() {
     let items = [1, 4, 9, 5, 2, 3, 6, 7, 8, 0];
     let mut r = fastrand::Rng::new();

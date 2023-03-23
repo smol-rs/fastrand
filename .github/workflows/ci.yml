@@ -52,6 +52,9 @@ jobs:
       - name: Build with no default features
         # Use no-std target to ensure we don't link to std.
         run: cargo build --no-default-features --target thumbv7m-none-eabi
+      - name: Build with no default features and alloc
+        # Use no-std target to ensure we don't link to std.
+        run: cargo build --no-default-features --features alloc --target thumbv7m-none-eabi
       - name: Test wasm
         run: wasm-pack test --headless --chrome
         if: startsWith(matrix.os, 'ubuntu')
@@ -75,7 +78,7 @@ jobs:
       matrix:
         # When updating this, the reminder to update the minimum supported
         # Rust version in Cargo.toml.
-        rust: ['1.34']
+        rust: ['1.36']
     steps:
       - uses: actions/checkout@v3
       - name: Install Rust
