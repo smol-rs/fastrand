@@ -83,6 +83,12 @@ let rng = fastrand::Rng::new();
 let mut bytes: Vec<u8> = repeat_with(|| rng.u8(..)).take(10_000).collect();
 ```
 
+# Features
+
+- `std` (enabled by default): Enables the `std` library. This is required for the global
+  generator and global entropy. Without this feature, [`Rng`] can only be instantiated using
+  the [`with_seed`](Rng::with_seed) method.
+
 ## License
 
 Licensed under either of
