@@ -5,11 +5,6 @@ use crate::Rng;
 use std::cell::Cell;
 use std::ops::RangeBounds;
 
-#[cfg(all(target_arch = "wasm32", not(target_os = "wasi")))]
-use instant::Instant;
-#[cfg(not(all(target_arch = "wasm32", not(target_os = "wasi"))))]
-use std::time::Instant;
-
 impl Default for Rng {
     /// Initialize the `Rng` from the system's random number generator.
     ///
@@ -29,17 +24,7 @@ impl Rng {
 }
 
 thread_local! {
-    static RNG: Cell<Rng> = Cell::new(Rng({
-        use std::collections::hash_map::DefaultHasher;
-        use std::hash::{Hash, Hasher};
-        use std::thread;
-
-        let mut hasher = DefaultHasher::new();
-        Instant::now().hash(&mut hasher);
-        thread::current().id().hash(&mut hasher);
-        let hash = hasher.finish();
-        (hash << 1) | 1
-    }));
+    static RNG: Cell<Rng> = Cell::new(Rng(random_seed().unwrap_or(0x4d595df4d0f33173)));
 }
 
 /// Run an operation with the current thread-local generator.
@@ -189,4 +174,28 @@ pub fn f64() -> f64 {
 /// Collects `amount` values at random from the iterator into a vector.
 pub fn choose_multiple<T: Iterator>(source: T, amount: usize) -> Vec<T::Item> {
     with_rng(|rng| rng.choose_multiple(source, amount))
+}
+
+#[cfg(not(all(target_arch = "wasm32", not(target_os = "wasi"))))]
+fn random_seed() -> Option<u64> {
+    use std::collections::hash_map::DefaultHasher;
+    use std::hash::{Hash, Hasher};
+    use std::thread;
+    use std::time::Instant;
+
+    let mut hasher = DefaultHasher::new();
+    Instant::now().hash(&mut hasher);
+    thread::current().id().hash(&mut hasher);
+    let hash = hasher.finish();
+    Some((hash << 1) | 1)
+}
+
+#[cfg(all(target_arch = "wasm32", not(target_os = "wasi")))]
+fn random_seed() -> Option<u64> {
+    // TODO(notgull): Failures should be logged somewhere.
+    let mut seed = [0u8; 8];
+    web_sys::window()
+        .and_then(|window| window.crypto().ok())
+        .and_then(|crypto| crypto.get_random_values_with_u8_array(&mut seed).ok())
+        .map(|_| u64::from_ne_bytes(seed))
 }

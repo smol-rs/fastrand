@@ -17,13 +17,16 @@ exclude = ["/.*"]
 [features]
 default = ["std"]
 alloc = []
-std = ["alloc", "instant"]
+std = ["alloc"]
 
-[target.'cfg(all(target_arch = "wasm32", not(target_os = "wasi")))'.dependencies]
-instant = { version = "0.1", optional = true }
+[target.'cfg(all(target_arch = "wasm32", not(target_os = "wasi")))'.dependencies.web-sys]
+version = "0.3.62"
+features = [
+    "Window",
+    "Crypto"
+]
 
 [target.'cfg(all(target_arch = "wasm32", not(target_os = "wasi")))'.dev-dependencies]
-instant = { version = "0.1", features = ["wasm-bindgen"] }
 wasm-bindgen-test = "0.3"
 getrandom = { version = "0.2", features = ["js"] }
 
