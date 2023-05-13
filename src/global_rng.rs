@@ -5,6 +5,9 @@ use crate::Rng;
 use std::cell::Cell;
 use std::ops::RangeBounds;
 
+// Chosen by fair roll of the dice.
+const DEFAULT_RNG_SEED: u64 = 0xef6f79ed30ba75a;
+
 impl Default for Rng {
     /// Initialize the `Rng` from the system's random number generator.
     ///
@@ -24,7 +27,7 @@ impl Rng {
 }
 
 thread_local! {
-    static RNG: Cell<Rng> = Cell::new(Rng(random_seed().unwrap_or(0x4d595df4d0f33173)));
+    static RNG: Cell<Rng> = Cell::new(Rng(random_seed().unwrap_or(DEFAULT_RNG_SEED)));
 }
 
 /// Run an operation with the current thread-local generator.
@@ -190,12 +193,15 @@ fn random_seed() -> Option<u64> {
     Some((hash << 1) | 1)
 }
 
-#[cfg(all(target_arch = "wasm32", not(target_os = "wasi")))]
+#[cfg(all(target_arch = "wasm32", not(target_os = "wasi"), feature = "js"))]
 fn random_seed() -> Option<u64> {
     // TODO(notgull): Failures should be logged somewhere.
     let mut seed = [0u8; 8];
-    web_sys::window()
-        .and_then(|window| window.crypto().ok())
-        .and_then(|crypto| crypto.get_random_values_with_u8_array(&mut seed).ok())
-        .map(|_| u64::from_ne_bytes(seed))
+    getrandom::getrandom(&mut seed).ok()?;
+    Some(u64::from_ne_bytes(seed))
+}
+
+#[cfg(all(target_arch = "wasm32", not(target_os = "wasi"), not(feature = "js")))]
+fn random_seed() -> Option<u64> {
+    None
 }

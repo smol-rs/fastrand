@@ -78,6 +78,19 @@
 //! - `std` (enabled by default): Enables the `std` library. This is required for the global
 //!   generator and global entropy. Without this feature, [`Rng`] can only be instantiated using
 //!   the [`with_seed`](Rng::with_seed) method.
+//! - `js`: Assumes that WebAssembly targets are being run in a JavaScript environment. See the
+//!   [WebAssembly Notes](#webassembly-notes) section for more information.
+//!
+//! # WebAssembly Notes
+//!
+//! For non-WASI WASM targets, there is additional sublety to consider when utilizing the global RNG.
+//! By default, `std` targets will use entropy sources in the standard library to seed the global RNG.
+//! However, these sources are not available by default on WASM targets outside of WASI.
+//!
+//! If the `js` feature is enabled, this crate will assume that it is running in a JavaScript
+//! environment. At this point, the [`getrandom`] crate will be used in order to access the available
+//! entropy sources and seed the global RNG. If the `js` feature is not enabled, the global RNG will
+//! use a predefined seed.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
