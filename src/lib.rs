@@ -91,7 +91,7 @@
 //! environment. At this point, the [`getrandom`] crate will be used in order to access the available
 //! entropy sources and seed the global RNG. If the `js` feature is not enabled, the global RNG will
 //! use a predefined seed.
-//! 
+//!
 //! [`getrandom`]: https://crates.io/crates/getrandom
 
 #![cfg_attr(not(feature = "std"), no_std)]
