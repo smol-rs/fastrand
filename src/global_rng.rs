@@ -179,7 +179,10 @@ pub fn choose_multiple<T: Iterator>(source: T, amount: usize) -> Vec<T::Item> {
     with_rng(|rng| rng.choose_multiple(source, amount))
 }
 
-#[cfg(not(all(target_arch = "wasm32", not(target_os = "wasi"))))]
+#[cfg(not(all(
+    any(target_arch = "wasm32", target_arch = "wasm64"),
+    target_os = "unknown"
+)))]
 fn random_seed() -> Option<u64> {
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};
@@ -193,7 +196,11 @@ fn random_seed() -> Option<u64> {
     Some((hash << 1) | 1)
 }
 
-#[cfg(all(target_arch = "wasm32", not(target_os = "wasi"), feature = "js"))]
+#[cfg(all(
+    any(target_arch = "wasm32", target_arch = "wasm64"),
+    target_os = "unknown",
+    feature = "js"
+))]
 fn random_seed() -> Option<u64> {
     // TODO(notgull): Failures should be logged somewhere.
     let mut seed = [0u8; 8];
@@ -201,7 +208,11 @@ fn random_seed() -> Option<u64> {
     Some(u64::from_ne_bytes(seed))
 }
 
-#[cfg(all(target_arch = "wasm32", not(target_os = "wasi"), not(feature = "js")))]
+#[cfg(all(
+    any(target_arch = "wasm32", target_arch = "wasm64"),
+    target_os = "unknown",
+    not(feature = "js")
+))]
 fn random_seed() -> Option<u64> {
     None
 }
