@@ -5,10 +5,8 @@ use crate::Rng;
 use std::cell::Cell;
 use std::ops::RangeBounds;
 
-#[cfg(all(target_arch = "wasm32", not(target_os = "wasi")))]
-use instant::Instant;
-#[cfg(not(all(target_arch = "wasm32", not(target_os = "wasi"))))]
-use std::time::Instant;
+// Chosen by fair roll of the dice.
+const DEFAULT_RNG_SEED: u64 = 0xef6f79ed30ba75a;
 
 impl Default for Rng {
     /// Initialize the `Rng` from the system's random number generator.
@@ -29,17 +27,7 @@ impl Rng {
 }
 
 thread_local! {
-    static RNG: Cell<Rng> = Cell::new(Rng({
-        use std::collections::hash_map::DefaultHasher;
-        use std::hash::{Hash, Hasher};
-        use std::thread;
-
-        let mut hasher = DefaultHasher::new();
-        Instant::now().hash(&mut hasher);
-        thread::current().id().hash(&mut hasher);
-        let hash = hasher.finish();
-        (hash << 1) | 1
-    }));
+    static RNG: Cell<Rng> = Cell::new(Rng(random_seed().unwrap_or(DEFAULT_RNG_SEED)));
 }
 
 /// Run an operation with the current thread-local generator.
@@ -189,4 +177,42 @@ pub fn f64() -> f64 {
 /// Collects `amount` values at random from the iterator into a vector.
 pub fn choose_multiple<T: Iterator>(source: T, amount: usize) -> Vec<T::Item> {
     with_rng(|rng| rng.choose_multiple(source, amount))
+}
+
+#[cfg(not(all(
+    any(target_arch = "wasm32", target_arch = "wasm64"),
+    target_os = "unknown"
+)))]
+fn random_seed() -> Option<u64> {
+    use std::collections::hash_map::DefaultHasher;
+    use std::hash::{Hash, Hasher};
+    use std::thread;
+    use std::time::Instant;
+
+    let mut hasher = DefaultHasher::new();
+    Instant::now().hash(&mut hasher);
+    thread::current().id().hash(&mut hasher);
+    let hash = hasher.finish();
+    Some((hash << 1) | 1)
+}
+
+#[cfg(all(
+    any(target_arch = "wasm32", target_arch = "wasm64"),
+    target_os = "unknown",
+    feature = "js"
+))]
+fn random_seed() -> Option<u64> {
+    // TODO(notgull): Failures should be logged somewhere.
+    let mut seed = [0u8; 8];
+    getrandom::getrandom(&mut seed).ok()?;
+    Some(u64::from_ne_bytes(seed))
+}
+
+#[cfg(all(
+    any(target_arch = "wasm32", target_arch = "wasm64"),
+    target_os = "unknown",
+    not(feature = "js")
+))]
+fn random_seed() -> Option<u64> {
+    None
 }
