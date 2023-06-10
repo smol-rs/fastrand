@@ -282,7 +282,7 @@ impl Rng {
 
     /// Clones the generator by deterministically deriving a new generator based on the initial
     /// seed.
-    /// 
+    ///
     /// This function can be used to create a new generator that is a "spinoff" of the old
     /// generator. The new generator will not produce the same sequence of values as the
     /// old generator.
