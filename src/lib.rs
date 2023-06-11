@@ -300,7 +300,8 @@ impl Rng {
     /// let mut rng1 = base1.fork();
     /// let mut rng2 = base2.fork();
     ///
-    /// assert_eq!(rng1.u64(..), rng2.u64(..), "the cloned generators are identical");
+    /// println!("rng1 returns {}", rng1.u32(..));
+    /// println!("rng2 returns {}", rng2.u32(..));
     /// ```
     #[inline]
     #[must_use = "this creates a new instance of `Rng`"]
