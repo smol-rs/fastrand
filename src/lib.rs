@@ -283,22 +283,25 @@ impl Rng {
     /// Clones the generator by deterministically deriving a new generator based on the initial
     /// seed.
     ///
+    /// This function can be used to create a new generator that is a "spinoff" of the old
+    /// generator. The new generator will not produce the same sequence of values as the
+    /// old generator.
+    ///
     /// # Example
     ///
     /// ```
     /// // Seed two generators equally, and clone both of them.
-    /// let mut base1 = fastrand::Rng::new();
-    /// base1.seed(0x4d595df4d0f33173);
+    /// let mut base1 = fastrand::Rng::with_seed(0x4d595df4d0f33173);
     /// base1.bool(); // Use the generator once.
     ///
-    /// let mut base2 = fastrand::Rng::new();
-    /// base2.seed(0x4d595df4d0f33173);
+    /// let mut base2 = fastrand::Rng::with_seed(0x4d595df4d0f33173);
     /// base2.bool(); // Use the generator once.
     ///
-    /// let mut rng1 = base1.clone();
-    /// let mut rng2 = base2.clone();
+    /// let mut rng1 = base1.fork();
+    /// let mut rng2 = base2.fork();
     ///
-    /// assert_eq!(rng1.u64(..), rng2.u64(..), "the cloned generators are identical");
+    /// println!("rng1 returns {}", rng1.u32(..));
+    /// println!("rng2 returns {}", rng2.u32(..));
     /// ```
     #[inline]
     #[must_use = "this creates a new instance of `Rng`"]
