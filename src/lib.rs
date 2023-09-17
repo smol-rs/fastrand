@@ -72,6 +72,9 @@
 //! let mut rng = fastrand::Rng::new();
 //! let mut bytes: Vec<u8> = repeat_with(|| rng.u8(..)).take(10_000).collect();
 //! ```
+//! 
+//! This crate aims to expose a core set of useful randomness primitives. For more niche algorithms,
+//! consider using the [`fastrand-contrib`] crate alongside this one.
 //!
 //! # Features
 //!
@@ -92,6 +95,7 @@
 //! entropy sources and seed the global RNG. If the `js` feature is not enabled, the global RNG will
 //! use a predefined seed.
 //!
+//! [`fastrand-contrib`]: https://crates.io/crates/fastrand-contrib
 //! [`getrandom`]: https://crates.io/crates/getrandom
 
 #![cfg_attr(not(feature = "std"), no_std)]
