@@ -1,3 +1,8 @@
+# Version 2.0.1
+
+- Clarify documentation for the `fork()` method. (#62)
+- Mention `fastrand-contrib` in documentation. (#70)
+
 # Version 2.0.0
 
 - **Breaking:** Remove interior mutability from `Rng`. (#47)
