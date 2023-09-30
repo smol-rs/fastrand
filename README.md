@@ -1,6 +1,6 @@
 # fastrand
 
-[![Build](https://github.com/smol-rs/fastrand/workflows/Build%20and%20test/badge.svg)](
+[![Build](https://github.com/smol-rs/fastrand/workflows/CI/badge.svg)](
 https://github.com/smol-rs/fastrand/actions)
 [![License](https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue.svg)](
 https://github.com/smol-rs/fastrand)
