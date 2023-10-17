@@ -193,8 +193,7 @@ fn random_seed() -> Option<u64> {
     let mut hasher = DefaultHasher::new();
     Instant::now().hash(&mut hasher);
     thread::current().id().hash(&mut hasher);
-    let hash = hasher.finish();
-    Some((hash << 1) | 1)
+    Some(hasher.finish())
 }
 
 #[cfg(all(
