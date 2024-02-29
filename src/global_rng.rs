@@ -23,7 +23,7 @@ impl Rng {
     /// Creates a new random number generator.
     #[inline]
     pub fn new() -> Rng {
-        try_with_rng(Rng::fork).unwrap_or_else(|_| Rng::with_seed(0x4d595df4d0f33173))
+        with_rng(Rng::fork)
     }
 }
 
@@ -35,18 +35,6 @@ std::thread_local! {
 #[inline]
 fn with_rng<R>(f: impl FnOnce(&mut Rng) -> R) -> R {
     RNG.with(|rng| {
-        let current = rng.replace(Rng(0));
-
-        let mut restore = RestoreOnDrop { rng, current };
-
-        f(&mut restore.current)
-    })
-}
-
-/// Try to run an operation with the current thread-local generator.
-#[inline]
-fn try_with_rng<R>(f: impl FnOnce(&mut Rng) -> R) -> Result<R, std::thread::AccessError> {
-    RNG.try_with(|rng| {
         let current = rng.replace(Rng(0));
 
         let mut restore = RestoreOnDrop { rng, current };
