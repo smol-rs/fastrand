@@ -286,10 +286,7 @@ impl Rng {
     #[inline]
     #[must_use = "this creates a new instance of `Rng`; if you want to initialize the thread-local generator, use `fastrand::seed()` instead"]
     pub fn with_seed(seed: u64) -> Self {
-        let mut rng = Rng(0);
-
-        rng.seed(seed);
-        rng
+        Rng(seed)
     }
 
     /// Clones the generator by deterministically deriving a new generator based on the initial
