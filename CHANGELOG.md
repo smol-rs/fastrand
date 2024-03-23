@@ -1,3 +1,7 @@
+# Version 2.0.2
+
+- Slight restructuring of the `with_seed` function. (#79)
+
 # Version 2.0.1
 
 - Clarify documentation for the `fork()` method. (#62)
