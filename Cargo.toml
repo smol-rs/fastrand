@@ -18,10 +18,10 @@ exclude = ["/.*"]
 default = ["std"]
 alloc = []
 std = ["alloc"]
-js = ["std", "getrandom"]
+js = ["std", "getrandom/js"]
 
-[target.'cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown"))'.dependencies]
-getrandom = { version = "0.2", features = ["js"], optional = true }
+[dependencies]
+getrandom = "0.2"
 
 [target.'cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown"))'.dev-dependencies]
 wasm-bindgen-test = "0.3"

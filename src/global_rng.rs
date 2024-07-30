@@ -182,25 +182,9 @@ pub fn choose_multiple<T: Iterator>(source: T, amount: usize) -> Vec<T::Item> {
 
 #[cfg(not(all(
     any(target_arch = "wasm32", target_arch = "wasm64"),
-    target_os = "unknown"
-)))]
-fn random_seed() -> Option<u64> {
-    use std::collections::hash_map::DefaultHasher;
-    use std::hash::{Hash, Hasher};
-    use std::thread;
-    use std::time::Instant;
-
-    let mut hasher = DefaultHasher::new();
-    Instant::now().hash(&mut hasher);
-    thread::current().id().hash(&mut hasher);
-    Some(hasher.finish())
-}
-
-#[cfg(all(
-    any(target_arch = "wasm32", target_arch = "wasm64"),
     target_os = "unknown",
-    feature = "js"
-))]
+    not(feature = "js")
+)))]
 fn random_seed() -> Option<u64> {
     // TODO(notgull): Failures should be logged somewhere.
     let mut seed = [0u8; 8];
