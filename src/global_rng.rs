@@ -139,6 +139,12 @@ pub fn shuffle<T>(slice: &mut [T]) {
     with_rng(|r| r.shuffle(slice))
 }
 
+/// Fill a byte slice with random data.
+#[inline]
+pub fn fill(slice: &mut [u8]) {
+    with_rng(|r| r.fill(slice))
+}
+
 macro_rules! integer {
     ($t:tt, $doc:tt) => {
         #[doc = $doc]
