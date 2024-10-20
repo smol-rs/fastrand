@@ -113,6 +113,6 @@ jobs:
       - name: Generate Cargo.lock
         run: cargo generate-lockfile
       # https://github.com/rustsec/audit-check/issues/2
-      - uses: rustsec/audit-check@main
+      - uses: rustsec/audit-check@v2.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
