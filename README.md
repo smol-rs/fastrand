@@ -43,7 +43,7 @@ let elem = v[i];
 Sample values from an array with `O(n)` complexity (`n` is the length of array):
 
 ```rust
-fastrand::choose_multiple(vec![1, 4, 5].iter(), 2);
+fastrand::choose_multiple([1, 4, 5], 2);
 fastrand::choose_multiple(0..20, 12);
 ```
 
