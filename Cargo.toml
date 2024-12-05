@@ -13,6 +13,7 @@ repository = "https://github.com/smol-rs/fastrand"
 keywords = ["simple", "fast", "rand", "random", "wyrand"]
 categories = ["algorithms"]
 exclude = ["/.*"]
+resolver = "2"
 
 [features]
 default = ["std"]
