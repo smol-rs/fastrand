@@ -79,8 +79,8 @@ jobs:
         run: rustup update stable
       - uses: taiki-e/setup-cross-toolchain-action@v1
         with:
-          target: wasm32-wasi
-      - run: cargo test --target wasm32-wasi
+          target: wasm32-wasip1
+      - run: cargo test --target wasm32-wasip1
 
   msrv:
     runs-on: ubuntu-latest
