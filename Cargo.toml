@@ -21,7 +21,7 @@ std = ["alloc"]
 js = ["std", "getrandom"]
 
 [target.'cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown"))'.dependencies]
-getrandom = { version = "0.3", features = ["js"], optional = true }
+getrandom = { version = "0.3", features = ["wasm_js"], optional = true }
 
 [target.'cfg(all(any(target_arch = "wasm32", target_arch = "wasm64"), target_os = "unknown"))'.dev-dependencies]
 wasm-bindgen-test = "0.3"
