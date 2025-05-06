@@ -85,6 +85,14 @@ fn fill() {
     r.fill(&mut b);
 
     assert_ne!(a, b);
+
+    let mut a = [0u8; 7];
+    let mut b = [0u8; 7];
+
+    r.fill(&mut a);
+    r.fill(&mut b);
+
+    assert_ne!(a, b);
 }
 
 #[test]
@@ -130,6 +138,16 @@ fn choose_multiple() {
             elements.retain(|&y| y != x);
         }
     }
+
+    let source = vec![1, 2];
+    let amount = 5;
+    let result = a.choose_multiple(source, amount);
+    assert_eq!(result.len(), 2);
+
+    let source: Vec<i32> = vec![];
+    let amount = 3;
+    let result = a.choose_multiple(source, amount);
+    assert_eq!(result.len(), 0);
 }
 
 #[test]
@@ -140,4 +158,42 @@ fn choice() {
     for item in &items {
         while r.choice(&items).unwrap() != item {}
     }
+
+    let items: Vec<i32> = Vec::new();
+    let mut r = fastrand::Rng::new();
+
+    let result = r.choice(items);
+    assert!(result.is_none());
+}
+
+#[test]
+fn char() {
+    let mut r = fastrand::Rng::new();
+    let result = r.char(..);
+    assert!(result >= '\u{0000}');
+}
+
+#[test]
+#[should_panic]
+fn char_panic() {
+    let mut r = fastrand::Rng::new();
+    r.char('z'..='a');
+}
+
+#[test]
+fn digit() {
+    let mut r = fastrand::Rng::new();
+    let result = r.digit(1);
+    assert_eq!(result, '0');
+
+    let result = r.digit(36);
+    assert!(result.is_ascii());
+}
+
+#[test]
+#[should_panic]
+fn digit_panid() {
+    let mut r = fastrand::Rng::new();
+    r.digit(0);
+    r.digit(37);
 }
