@@ -386,7 +386,8 @@ impl Rng {
         //
         // See e.g. Section 3.1 of Thomas, David B., et al. "Gaussian random number generators,
         // https://www.doc.ic.ac.uk/~wl/papers/07/csur07dt.pdf, for background.
-        (self.u64(..) >> 1) as f32 * (-63.0f32).exp2()
+        const MUL: f32 = 1.0 / (1u64 << 63) as f32;
+        (self.u64(..) >> 1) as f32 * MUL
     }
 
     /// Generates a random `f32` in range `0..1`.
@@ -405,7 +406,8 @@ impl Rng {
     /// Generates a random `f64` in range `0..=1`.
     pub fn f64_inclusive(&mut self) -> f64 {
         // See the comment in f32_inclusive() for more details.
-        (self.u64(..) >> 1) as f64 * (-63.0f64).exp2()
+        const MUL: f64 = 1.0 / (1u64 << 63) as f64;
+        (self.u64(..) >> 1) as f64 * MUL
     }
 
     /// Generates a random `f64` in range `0..1`.
