@@ -365,6 +365,7 @@ impl Rng {
     }
 
     /// Generates a random `f32` in range `0..=1`.
+    #[inline]
     pub fn f32_inclusive(&mut self) -> f32 {
         // Generate a number in 0..2^63 then convert to f32 and multiply by 2^(-63).
         //
@@ -394,6 +395,7 @@ impl Rng {
     ///
     /// Function `f32_inclusive()` is a little simpler and faster, so default
     /// to that if inclusive range is acceptable.
+    #[inline]
     pub fn f32(&mut self) -> f32 {
         loop {
             let x = self.f32_inclusive();
@@ -404,6 +406,7 @@ impl Rng {
     }
 
     /// Generates a random `f64` in range `0..=1`.
+    #[inline]
     pub fn f64_inclusive(&mut self) -> f64 {
         // See the comment in f32_inclusive() for more details.
         const MUL: f64 = 1.0 / (1u64 << 63) as f64;
@@ -414,6 +417,7 @@ impl Rng {
     ///
     /// Function `f64_inclusive()` is a little simpler and faster, so default
     /// to that if inclusive range is acceptable.
+    #[inline]
     pub fn f64(&mut self) -> f64 {
         loop {
             let x = self.f64_inclusive();
