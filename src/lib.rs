@@ -383,10 +383,16 @@ impl Rng {
         // is no larger than the bias in the underlying WyRand generator: since it only
         // has a 64-bit state, it necessarily already have biases of at least 2^(-64)
         // probability.
+        //
+        // See e.g. Section 3.1 of Thomas, David B., et al. "Gaussian random number generators,
+        // https://www.doc.ic.ac.uk/~wl/papers/07/csur07dt.pdf, for background.
         (self.u64(..) >> 1) as f32 * (-63.0f32).exp2()
     }
 
     /// Generates a random `f32` in range `0..1`.
+    /// 
+    /// Function `f32_inclusive()` is a little simpler and faster, so default
+    /// to that if inclusive range is acceptable.
     pub fn f32(&mut self) -> f32 {
         loop {
             let x = self.f32_inclusive();
@@ -403,6 +409,9 @@ impl Rng {
     }
 
     /// Generates a random `f64` in range `0..1`.
+    /// 
+    /// Function `f64_inclusive()` is a little simpler and faster, so default
+    /// to that if inclusive range is acceptable.
     pub fn f64(&mut self) -> f64 {
         loop {
             let x = self.f64_inclusive();
