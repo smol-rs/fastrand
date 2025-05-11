@@ -95,12 +95,49 @@ fn f32() {
 }
 
 #[test]
+fn f32_inclusive() {
+    let mut r = fastrand::Rng::with_seed(0);
+    let tiny = (-24.0f32).exp2();
+    let mut count_top_half = 0;
+    let mut count_tiny_nonzero = 0;
+    let mut count_one = 0;
+    for _ in 0..100_000_000 {
+        let x = r.f32_inclusive();
+        assert!(x >= 0.0 && x <= 1.0);
+        if x == 1.0 {
+            count_one += 1;
+        } else if x > 0.5 {
+            count_top_half += 1;
+        } else if x > 0.0 && x < tiny {
+            count_tiny_nonzero += 1;
+        }
+    }
+    assert!(count_top_half >= 49_000_000);
+    assert!(count_one > 0);
+    assert!(count_tiny_nonzero > 0);
+}
+
+#[test]
 fn f64() {
     let mut r = fastrand::Rng::with_seed(0);
     let mut count_top_half = 0;
     for _ in 0..100_000_000 {
         let x = r.f64();
         assert!(x >= 0.0 && x < 1.0);
+        if x > 0.5 {
+            count_top_half += 1;
+        }
+    }
+    assert!(count_top_half >= 49_000_000);
+}
+
+#[test]
+fn f64_inclusive() {
+    let mut r = fastrand::Rng::with_seed(0);
+    let mut count_top_half = 0;
+    for _ in 0..100_000_000 {
+        let x = r.f64();
+        assert!(x >= 0.0 && x <= 1.0);
         if x > 0.5 {
             count_top_half += 1;
         }

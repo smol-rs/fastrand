@@ -364,18 +364,52 @@ impl Rng {
         }
     }
 
+    /// Generates a random `f32` in range `0..=1`.
+    pub fn f32_inclusive(&mut self) -> f32 {
+        // Generate a number in 0..2^63 then convert to f32 and multiply by 2^(-63).
+        //
+        // Even though we're returning f32, we still generate u64 internally to make
+        // it possible to return nonzero numbers as small as 2^(-63). If we only
+        // generated u32 internally, the smallest nonzero number we could return
+        // would be 2^(-32).
+        //
+        // The integer we generate is in 0..2^63 rather than 0..2^64 to improve speed
+        // on x86-64, which has efficient i64->float conversion (cvtsi2ss) but for
+        // which u64->float conversion must be implemented in software.
+        //
+        // There is still some remaining bias in the int-to-float conversion, because
+        // nonzero numbers <=2^(-64) are never generated, even though they are
+        // expressible in f32. However, at this point the bias in int-to-float conversion
+        // is no larger than the bias in the underlying WyRand generator: since it only
+        // has a 64-bit state, it necessarily already have biases of at least 2^(-64)
+        // probability.
+        (self.u64(..) >> 1) as f32 * (-63.0f32).exp2()
+    }
+
     /// Generates a random `f32` in range `0..1`.
     pub fn f32(&mut self) -> f32 {
-        let b = 32;
-        let f = core::f32::MANTISSA_DIGITS - 1;
-        f32::from_bits((1 << (b - 2)) - (1 << f) + (self.u32(..) >> (b - f))) - 1.0
+        loop {
+            let x = self.f32_inclusive();
+            if x < 1.0 {
+                return x;
+            }
+        }
+    }
+
+   /// Generates a random `f64` in range `0..=1`.
+    pub fn f64_inclusive(&mut self) -> f64 {
+        // See the comment in f32_inclusive() for more details.
+        (self.u64(..) >> 1) as f64 * (-63.0f64).exp2()
     }
 
     /// Generates a random `f64` in range `0..1`.
     pub fn f64(&mut self) -> f64 {
-        let b = 64;
-        let f = core::f64::MANTISSA_DIGITS - 1;
-        f64::from_bits((1 << (b - 2)) - (1 << f) + (self.u64(..) >> (b - f))) - 1.0
+        loop {
+            let x = self.f64_inclusive();
+            if x < 1.0 {
+                return x;
+            }
+        }
     }
 
     /// Collects `amount` values at random from the iterable into a vector.
