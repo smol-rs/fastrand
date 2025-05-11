@@ -390,7 +390,7 @@ impl Rng {
     }
 
     /// Generates a random `f32` in range `0..1`.
-    /// 
+    ///
     /// Function `f32_inclusive()` is a little simpler and faster, so default
     /// to that if inclusive range is acceptable.
     pub fn f32(&mut self) -> f32 {
@@ -402,14 +402,14 @@ impl Rng {
         }
     }
 
-   /// Generates a random `f64` in range `0..=1`.
+    /// Generates a random `f64` in range `0..=1`.
     pub fn f64_inclusive(&mut self) -> f64 {
         // See the comment in f32_inclusive() for more details.
         (self.u64(..) >> 1) as f64 * (-63.0f64).exp2()
     }
 
     /// Generates a random `f64` in range `0..1`.
-    /// 
+    ///
     /// Function `f64_inclusive()` is a little simpler and faster, so default
     /// to that if inclusive range is acceptable.
     pub fn f64(&mut self) -> f64 {
