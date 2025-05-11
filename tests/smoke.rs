@@ -83,7 +83,7 @@ fn f32() {
     let mut count_top_half = 0;
     for _ in 0..100_000_000 {
         let x = r.f32();
-        assert!(x >= 0.0 && x < 1.0);
+        assert!((0.0..1.0).contains(&x));
         if x > 0.0 && x < tiny {
             count_tiny_nonzero += 1;
         } else if x > 0.5 {
@@ -103,7 +103,7 @@ fn f32_inclusive() {
     let mut count_one = 0;
     for _ in 0..100_000_000 {
         let x = r.f32_inclusive();
-        assert!(x >= 0.0 && x <= 1.0);
+        assert!((0.0..=1.0).contains(&x));
         if x == 1.0 {
             count_one += 1;
         } else if x > 0.5 {
@@ -123,7 +123,7 @@ fn f64() {
     let mut count_top_half = 0;
     for _ in 0..100_000_000 {
         let x = r.f64();
-        assert!(x >= 0.0 && x < 1.0);
+        assert!((0.0..1.0).contains(&x));
         if x > 0.5 {
             count_top_half += 1;
         }
@@ -136,8 +136,8 @@ fn f64_inclusive() {
     let mut r = fastrand::Rng::with_seed(0);
     let mut count_top_half = 0;
     for _ in 0..100_000_000 {
-        let x = r.f64();
-        assert!(x >= 0.0 && x <= 1.0);
+        let x = r.f64_inclusive();
+        assert!((0.0..=1.0).contains(&x));
         if x > 0.5 {
             count_top_half += 1;
         }
