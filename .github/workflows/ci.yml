@@ -70,7 +70,7 @@ jobs:
         # Use no-std target to ensure we don't link to std.
         run: cargo build --no-default-features --features alloc --target thumbv7m-none-eabi
       - name: Test wasm
-        run: wasm-pack test --headless --chrome
+        run: RUSTFLAGS='--cfg getrandom_backend="wasm_js"' wasm-pack test --headless --chrome
         if: startsWith(matrix.os, 'ubuntu')
       - run: cargo bench
         if: startsWith(matrix.rust, 'nightly')
