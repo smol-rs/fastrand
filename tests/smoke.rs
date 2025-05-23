@@ -95,7 +95,7 @@ fn f64() {
 fn digit() {
     for base in 1..36 {
         let result = fastrand::digit(base);
-        assert!(('0'..='9').contains(&result) || ('a'..='z').contains(&result));
+        assert!(result.is_ascii_digit() || result.is_ascii_lowercase());
     }
 }
 
@@ -188,7 +188,7 @@ fn rng_digit() {
     let mut rng = fastrand::Rng::new();
     for base in 1..36 {
         let result = rng.digit(base);
-        assert!(('0'..='9').contains(&result) || ('a'..='z').contains(&result));
+        assert!(result.is_ascii_digit() || result.is_ascii_lowercase());
     }
 }
 
@@ -196,7 +196,7 @@ fn rng_digit() {
 #[should_panic]
 fn rng_digit_panic_1() {
     let mut rng = fastrand::Rng::new();
-    let result = rng.digit(0);
+    let _result = rng.digit(0);
 }
 
 #[test]
@@ -204,7 +204,7 @@ fn rng_digit_panic_1() {
 fn rng_digit_panic_2() {
     let mut rng = fastrand::Rng::new();
     let base = rng.u32(37..);
-    let result = rng.digit(base);
+    let _result = rng.digit(base);
 }
 
 #[test]
@@ -281,7 +281,7 @@ fn uppercase() {
 #[should_panic]
 fn char_panic() {
     let mut rng = fastrand::Rng::new();
-    let result = rng.char('z'..='a');
+    let _result = rng.char('z'..='a');
 }
 
 #[test]
