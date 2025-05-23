@@ -261,13 +261,13 @@ macro_rules! rng_integer {
             };
 
             let low = match range.start_bound() {
-                Bound::Unbounded => core::$t::MIN,
+                Bound::Unbounded => $t::MIN,
                 Bound::Included(&x) => x,
                 Bound::Excluded(&x) => x.checked_add(1).unwrap_or_else(panic_empty_range),
             };
 
             let high = match range.end_bound() {
-                Bound::Unbounded => core::$t::MAX,
+                Bound::Unbounded => $t::MAX,
                 Bound::Included(&x) => x,
                 Bound::Excluded(&x) => x.checked_sub(1).unwrap_or_else(panic_empty_range),
             };
@@ -276,7 +276,7 @@ macro_rules! rng_integer {
                 panic_empty_range();
             }
 
-            if low == core::$t::MIN && high == core::$t::MAX {
+            if low == $t::MIN && high == $t::MAX {
                 self.$gen() as $t
             } else {
                 let len = high.wrapping_sub(low).wrapping_add(1);
@@ -367,14 +367,14 @@ impl Rng {
     /// Generates a random `f32` in range `0..1`.
     pub fn f32(&mut self) -> f32 {
         let b = 32;
-        let f = core::f32::MANTISSA_DIGITS - 1;
+        let f = f32::MANTISSA_DIGITS - 1;
         f32::from_bits((1 << (b - 2)) - (1 << f) + (self.u32(..) >> (b - f))) - 1.0
     }
 
     /// Generates a random `f64` in range `0..1`.
     pub fn f64(&mut self) -> f64 {
         let b = 64;
-        let f = core::f64::MANTISSA_DIGITS - 1;
+        let f = f64::MANTISSA_DIGITS - 1;
         f64::from_bits((1 << (b - 2)) - (1 << f) + (self.u64(..) >> (b - f))) - 1.0
     }
 
