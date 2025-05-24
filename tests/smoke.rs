@@ -145,8 +145,10 @@ fn fill() {
 
     let mut a = [0u8; 9];
     let mut b = [0u8; 9];
+
     r.fill(&mut a);
     r.fill(&mut b);
+
     assert_ne!(a, b);
 }
 
@@ -157,6 +159,8 @@ fn global_rng_fill() {
 
     fastrand::fill(&mut a);
     fastrand::fill(&mut b);
+
+    assert_ne!(a, b);
 }
 
 #[test]
