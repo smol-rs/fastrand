@@ -28,7 +28,7 @@ wasm-bindgen-test = "0.3"
 getrandom = { version = "0.2", features = ["js"] }
 
 [dev-dependencies]
-rand = "0.8"
+rand = "0.9"
 wyhash = "0.5"
 getrandom = "0.2"
 
