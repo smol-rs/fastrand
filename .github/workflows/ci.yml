@@ -44,7 +44,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         rust: [nightly, beta, stable]
     steps:
-      - uses: actions/checkout@v4
+      - uses: taiki-e/checkout-action@v1
       - name: Install Rust
         # --no-self-update is necessary because the windows environment cannot self-update rustup.exe.
         run: rustup update ${{ matrix.rust }} --no-self-update && rustup default ${{ matrix.rust }}
@@ -74,7 +74,7 @@ jobs:
   wasi:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: taiki-e/checkout-action@v1
       - name: Install Rust
         run: rustup update stable
       - uses: taiki-e/setup-cross-toolchain-action@v1
@@ -85,7 +85,7 @@ jobs:
   msrv:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: taiki-e/checkout-action@v1
       - name: Install cargo-hack
         uses: taiki-e/install-action@cargo-hack
       - run: cargo hack build --feature-powerset --no-dev-deps --rust-version
@@ -93,7 +93,7 @@ jobs:
   clippy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: taiki-e/checkout-action@v1
       - name: Install Rust
         run: rustup update stable
       - run: cargo clippy --all-features --tests --examples
