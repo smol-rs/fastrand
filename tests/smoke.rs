@@ -146,6 +146,47 @@ fn f64_inclusive() {
 }
 
 #[test]
+fn digit() {
+    for base in 1..36 {
+        let result = fastrand::digit(base);
+        assert!(result.is_ascii_digit() || result.is_ascii_lowercase());
+    }
+}
+
+#[test]
+fn global_rng_choice() {
+    let items = [1, 4, 9, 5, 2, 3, 6, 7, 8, 0];
+
+    for item in &items {
+        while fastrand::choice(&items).unwrap() != item {}
+    }
+}
+
+#[test]
+fn global_rng_alphabetic() {
+    for _ in 0..1000 {
+        let result = fastrand::alphabetic();
+        assert!(result.is_ascii_alphabetic())
+    }
+}
+
+#[test]
+fn global_rng_lowercase() {
+    for _ in 0..1000 {
+        let result = fastrand::lowercase();
+        assert!(result.is_ascii_lowercase())
+    }
+}
+
+#[test]
+fn global_rng_uppercase() {
+    for _ in 0..1000 {
+        let result = fastrand::uppercase();
+        assert!(result.is_ascii_uppercase())
+    }
+}
+
+#[test]
 fn fill() {
     let mut r = fastrand::Rng::new();
     let mut a = [0u8; 64];
