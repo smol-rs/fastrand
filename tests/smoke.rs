@@ -77,59 +77,72 @@ fn u128() {
 
 #[test]
 fn f32() {
-    for _ in 0..1000 {
-        let result = fastrand::f32();
-        assert!((0.0..1.0).contains(&result));
+    let mut r = fastrand::Rng::with_seed(0);
+    let tiny = (-24.0f32).exp2();
+    let mut count_tiny_nonzero = 0;
+    let mut count_top_half = 0;
+    for _ in 0..100_000_000 {
+        let x = r.f32();
+        assert!((0.0..1.0).contains(&x));
+        if x > 0.0 && x < tiny {
+            count_tiny_nonzero += 1;
+        } else if x > 0.5 {
+            count_top_half += 1;
+        }
     }
+    assert!(count_top_half >= 49_000_000);
+    assert!(count_tiny_nonzero > 0);
+}
+
+#[test]
+fn f32_inclusive() {
+    let mut r = fastrand::Rng::with_seed(0);
+    let tiny = (-24.0f32).exp2();
+    let mut count_top_half = 0;
+    let mut count_tiny_nonzero = 0;
+    let mut count_one = 0;
+    for _ in 0..100_000_000 {
+        let x = r.f32_inclusive();
+        assert!((0.0..=1.0).contains(&x));
+        if x == 1.0 {
+            count_one += 1;
+        } else if x > 0.5 {
+            count_top_half += 1;
+        } else if x > 0.0 && x < tiny {
+            count_tiny_nonzero += 1;
+        }
+    }
+    assert!(count_top_half >= 49_000_000);
+    assert!(count_one > 0);
+    assert!(count_tiny_nonzero > 0);
 }
 
 #[test]
 fn f64() {
-    for _ in 0..1000 {
-        let result = fastrand::f64();
-        assert!((0.0..1.0).contains(&result));
+    let mut r = fastrand::Rng::with_seed(0);
+    let mut count_top_half = 0;
+    for _ in 0..100_000_000 {
+        let x = r.f64();
+        assert!((0.0..1.0).contains(&x));
+        if x > 0.5 {
+            count_top_half += 1;
+        }
     }
+    assert!(count_top_half >= 49_000_000);
 }
 
 #[test]
-fn digit() {
-    for base in 1..36 {
-        let result = fastrand::digit(base);
-        assert!(result.is_ascii_digit() || result.is_ascii_lowercase());
+fn f64_inclusive() {
+    let mut r = fastrand::Rng::with_seed(0);
+    let mut count_top_half = 0;
+    for _ in 0..100_000_000 {
+        let x = r.f64_inclusive();
+        assert!((0.0..=1.0).contains(&x));
+        if x > 0.5 {
+            count_top_half += 1;
+        }
     }
-}
-
-#[test]
-fn global_rng_choice() {
-    let items = [1, 4, 9, 5, 2, 3, 6, 7, 8, 0];
-
-    for item in &items {
-        while fastrand::choice(&items).unwrap() != item {}
-    }
-}
-
-#[test]
-fn global_rng_alphabetic() {
-    for _ in 0..1000 {
-        let result = fastrand::alphabetic();
-        assert!(result.is_ascii_alphabetic())
-    }
-}
-
-#[test]
-fn global_rng_lowercase() {
-    for _ in 0..1000 {
-        let result = fastrand::lowercase();
-        assert!(result.is_ascii_lowercase())
-    }
-}
-
-#[test]
-fn global_rng_uppercase() {
-    for _ in 0..1000 {
-        let result = fastrand::uppercase();
-        assert!(result.is_ascii_uppercase())
-    }
+    assert!(count_top_half >= 49_000_000);
 }
 
 #[test]

@@ -176,9 +176,19 @@ pub fn f32() -> f32 {
     with_rng(|r| r.f32())
 }
 
+/// Generates a random `f32` in range `0..=1`.
+pub fn f32_inclusive() -> f32 {
+    with_rng(|r| r.f32_inclusive())
+}
+
 /// Generates a random `f64` in range `0..1`.
 pub fn f64() -> f64 {
     with_rng(|r| r.f64())
+}
+
+/// Generates a random `f64` in range `0..=1`.
+pub fn f64_inclusive() -> f64 {
+    with_rng(|r| r.f64_inclusive())
 }
 
 /// Collects `amount` values at random from the iterable into a vector.
