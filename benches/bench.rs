@@ -75,6 +75,22 @@ fn u32_fastrand(b: &mut Bencher) {
 }
 
 #[bench]
+fn f32_fastrand(b: &mut Bencher) {
+    let mut rng = fastrand::Rng::new();
+    b.iter(|| {
+        let mut sum = 0.0;
+        for _ in 0..10_000 {
+            // AArch64:
+            // 0.856ns/iter: new f32().
+            // 0.857ns/iter: new f32_inclusive().
+            // 
+            sum += rng.f32_inclusive();
+        }
+        sum
+    })
+}
+
+#[bench]
 fn fill(b: &mut Bencher) {
     let mut rng = fastrand::Rng::new();
     b.iter(|| {
