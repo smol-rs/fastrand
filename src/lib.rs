@@ -121,7 +121,6 @@ use core::ops::{Bound, RangeBounds};
 use alloc::vec::Vec;
 
 #[cfg(feature = "std")]
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 mod global_rng;
 
 #[cfg(feature = "std")]
@@ -435,7 +434,6 @@ impl Rng {
     ///
     /// Complexity is `O(n)` where `n` is the length of the iterable.
     #[cfg(feature = "alloc")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "alloc")))]
     pub fn choose_multiple<I: IntoIterator>(&mut self, source: I, amount: usize) -> Vec<I::Item> {
         // Adapted from: https://docs.rs/rand/latest/rand/seq/trait.IteratorRandom.html#method.choose_multiple
         let mut reservoir = Vec::with_capacity(amount);
