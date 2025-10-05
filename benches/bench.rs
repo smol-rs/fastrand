@@ -79,23 +79,16 @@ fn f32_fastrand(b: &mut Bencher) {
     let mut rng = fastrand::Rng::new();
     b.iter(|| {
         // f32 sum unrolled 4x to hide f32-add latency.
-        let mut sum0 = 0.0;
-        let mut sum1 = 0.0;
-        let mut sum2 = 0.0;
-        let mut sum3 = 0.0;
+        let mut sum = 0.0;
         for _ in 0..2_500 {
             // AArch64:
-            // 0.344ns/iter: new f32_inclusive().
-            // 0.619ns/iter: new f32().
+            // 0.344ns/iter: new f32_inclusive().  (4 iters unrolled)
+            // 0.587ns/iter: new f32().  (2 iters unrolled)
             // 
             // 
-            sum0 += rng.f32();
-            sum1 += rng.f32();
-            sum2 += rng.f32();
-            sum3 += rng.f32();
-
+            sum += rng.f32() + rng.f32() + rng.f32() + rng.f32();
         }
-        sum0 + sum1 + sum2 + sum3
+        sum
     })
 }
 
