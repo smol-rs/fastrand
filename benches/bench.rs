@@ -78,15 +78,14 @@ fn u32_fastrand(b: &mut Bencher) {
 fn f32_fastrand(b: &mut Bencher) {
     let mut rng = fastrand::Rng::new();
     b.iter(|| {
-        // f32 sum unrolled 4x to hide f32-add latency.
+        // f32 sum unrolled 2x to hide f32-add latency.
+        //
+        // Optimal amount of unrolling is somewhat sensitive to CPU and algorithm.
+        // Variously could be 2x, 3x, or 4x unrolling. On AArch64 and x86-64 on the
+        // current algorithm, 2x seems to be optimal on this benchmark.
         let mut sum = 0.0;
-        for _ in 0..2_500 {
-            // AArch64:
-            // 0.344ns/iter: new f32_inclusive().  (4 iters unrolled)
-            // 0.587ns/iter: new f32().  (2 iters unrolled)
-            // 
-            // 
-            sum += rng.f32() + rng.f32() + rng.f32() + rng.f32();
+        for _ in 0..5_000 {
+            sum += rng.f32() + rng.f32();
         }
         sum
     })
