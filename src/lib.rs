@@ -44,7 +44,7 @@
 //! fastrand::shuffle(&mut v);
 //! ```
 //!
-//! Generate a random [`Vec`] or [`String`]:
+//! Generate a random [`Vec`] or [`String`](alloc::string::String):
 //!
 //! ```
 //! use std::iter::repeat_with;
