@@ -8,7 +8,7 @@ use wyhash::WyRng;
 
 #[bench]
 fn shuffle_wyhash(b: &mut Bencher) {
-    let mut rng = WyRng::from_rng(thread_rng()).unwrap();
+    let mut rng = WyRng::from_rng(&mut rand::rng());
     let mut x = (0..100).collect::<Vec<usize>>();
     b.iter(|| {
         x.shuffle(&mut rng);
@@ -28,11 +28,11 @@ fn shuffle_fastrand(b: &mut Bencher) {
 
 #[bench]
 fn u8_wyhash(b: &mut Bencher) {
-    let mut rng = WyRng::from_rng(thread_rng()).unwrap();
+    let mut rng = WyRng::from_rng(&mut rand::rng());
     b.iter(|| {
         let mut sum = 0u8;
         for _ in 0..10_000 {
-            sum = sum.wrapping_add(rng.gen::<u8>());
+            sum = sum.wrapping_add(rng.random::<u8>());
         }
         sum
     })
@@ -52,11 +52,11 @@ fn u8_fastrand(b: &mut Bencher) {
 
 #[bench]
 fn u32_wyhash(b: &mut Bencher) {
-    let mut rng = WyRng::from_rng(thread_rng()).unwrap();
+    let mut rng = WyRng::from_rng(&mut rand::rng());
     b.iter(|| {
         let mut sum = 0u32;
         for _ in 0..10_000 {
-            sum = sum.wrapping_add(rng.gen::<u32>());
+            sum = sum.wrapping_add(rng.random::<u32>());
         }
         sum
     })
