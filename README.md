@@ -11,7 +11,7 @@ https://docs.rs/fastrand)
 
 A simple and fast random number generator.
 
-The implementation uses [Wyrand](https://github.com/wangyi-fudan/wyhash), a simple and fast
+The implementation uses [rapidhash](https://github.com/hoxxep/rapidhash), a simple and fast
 generator but **not** cryptographically secure.
 
 ## Examples
