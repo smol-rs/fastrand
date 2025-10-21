@@ -147,7 +147,7 @@ impl Rng {
     /// Generates a random `u64`.
     #[inline]
     fn gen_u64(&mut self) -> u64 {
-        rapidhash::rng::rapidrng_fast(&mut self.0)
+        rapidhash::rng::rapidrng_fast_not_portable(&mut self.0)
     }
 
     /// Generates a random `u128`.
