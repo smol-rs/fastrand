@@ -86,7 +86,7 @@
 //!
 //! # WebAssembly Notes
 //!
-//! For non-WASI WASM targets, there is additional sublety to consider when utilizing the global RNG.
+//! For non-WASI WASM targets, there is additional subtlety to consider when utilizing the global RNG.
 //! By default, `std` targets will use entropy sources in the standard library to seed the global RNG.
 //! However, these sources are not available by default on WASM targets outside of WASI.
 //!

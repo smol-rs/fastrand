@@ -6,7 +6,7 @@ use std::cell::Cell;
 use std::ops::RangeBounds;
 use std::vec::Vec;
 
-// Chosen by fair roll of the dice.
+// Chosen by a fair roll of the dice.
 const DEFAULT_RNG_SEED: u64 = 0xef6f79ed30ba75a;
 
 impl Default for Rng {
