@@ -1,3 +1,11 @@
+# Version 2.4.0
+
+- Bump MSRV to 1.63. (#104)
+- Improve quality of f32/f64 generation. (#103)
+- Add `f{32,64}_inclusive` and `Rng::f{32,64}_inclusive`. (#103)
+- Make `Rng::with_seed` const. (#107)
+- Update `getrandom` to 0.3. (#104)
+
 # Version 2.3.0
 
 - Accept `IntoIterator` in `choose_multiple` functions instead of just `Iterator`. (#92)
