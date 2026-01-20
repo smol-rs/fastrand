@@ -92,4 +92,5 @@ jobs:
       - uses: taiki-e/checkout-action@v1
       - name: Install cargo-hack
         uses: taiki-e/install-action@cargo-hack
-      - run: cargo hack build --feature-powerset --no-dev-deps --rust-version
+        # It's fine that the optional feature has a higher MSRV.
+      - run: cargo hack build --feature-powerset --skip js --no-dev-deps --rust-version
