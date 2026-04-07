@@ -220,7 +220,7 @@ fn random_seed() -> Option<u64> {
 fn random_seed() -> Option<u64> {
     // TODO(notgull): Failures should be logged somewhere.
     let mut seed = [0u8; 8];
-    getrandom::getrandom(&mut seed).ok()?;
+    getrandom::fill(&mut seed).ok()?;
     Some(u64::from_ne_bytes(seed))
 }
 
