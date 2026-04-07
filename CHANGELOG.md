@@ -1,3 +1,7 @@
+# Version 2.4.1
+
+- Fix build failure with `js` feature. (#125)
+
 # Version 2.4.0
 
 - Bump MSRV to 1.63. (#104)
