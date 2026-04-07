@@ -72,6 +72,9 @@ jobs:
       - name: Test wasm
         run: wasm-pack test --headless --chrome
         if: startsWith(matrix.os, 'ubuntu')
+      - name: Test wasm
+        run: wasm-pack test --headless --chrome --features js
+        if: startsWith(matrix.os, 'ubuntu')
       - run: cargo bench
         if: startsWith(matrix.rust, 'nightly')
 
