@@ -40,7 +40,7 @@ let i = fastrand::usize(..v.len());
 let elem = v[i];
 ```
 
-Sample values from an array with `O(n)` complexity (`n` is the length of array):
+Sample values from an array with `O(n)` complexity (`n` is the length of the array):
 
 ```rust
 fastrand::choose_multiple([1, 4, 5], 2);
@@ -79,7 +79,7 @@ generator:
 ```rust
 use std::iter::repeat_with;
 
-let rng = fastrand::Rng::new();
+let mut rng = fastrand::Rng::new();
 let mut bytes: Vec<u8> = repeat_with(|| rng.u8(..)).take(10_000).collect();
 ```
 

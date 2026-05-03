@@ -85,13 +85,13 @@ pub fn bool() -> bool {
     with_rng(|r| r.bool())
 }
 
-/// Generates a random `char` in ranges a-z and A-Z.
+/// Generates a random `char` in range a-z and A-Z.
 #[inline]
 pub fn alphabetic() -> char {
     with_rng(|r| r.alphabetic())
 }
 
-/// Generates a random `char` in ranges a-z, A-Z and 0-9.
+/// Generates a random `char` in range a-z, A-Z and 0-9.
 #[inline]
 pub fn alphanumeric() -> char {
     with_rng(|r| r.alphanumeric())
@@ -125,7 +125,7 @@ where
 
 /// Generates a random digit in the given `base`.
 ///
-/// Digits are represented by `char`s in ranges 0-9 and a-z.
+/// Digits are represented by `char`s in range 0-9 and a-z.
 ///
 /// Panics if the base is zero or greater than 36.
 #[inline]

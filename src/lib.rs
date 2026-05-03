@@ -29,7 +29,7 @@
 //! let elem = v[i];
 //! ```
 //!
-//! Sample values from an array with `O(n)` complexity (`n` is the length of array):
+//! Sample values from an array with `O(n)` complexity (`n` is the length of the array):
 //!
 //! ```
 //! fastrand::choose_multiple([1, 4, 5], 2);
@@ -322,14 +322,14 @@ impl Rng {
         Rng::with_seed(self.gen_u64())
     }
 
-    /// Generates a random `char` in ranges a-z and A-Z.
+    /// Generates a random `char` in range a-z and A-Z.
     #[inline]
     pub fn alphabetic(&mut self) -> char {
         const CHARS: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         *self.choice(CHARS).unwrap() as char
     }
 
-    /// Generates a random `char` in ranges a-z, A-Z and 0-9.
+    /// Generates a random `char` in range a-z, A-Z and 0-9.
     #[inline]
     pub fn alphanumeric(&mut self) -> char {
         const CHARS: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -344,7 +344,7 @@ impl Rng {
 
     /// Generates a random digit in the given `base`.
     ///
-    /// Digits are represented by `char`s in ranges 0-9 and a-z.
+    /// Digits are represented by `char`s in range 0-9 and a-z.
     ///
     /// Panics if the base is zero or greater than 36.
     #[inline]
