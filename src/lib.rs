@@ -128,12 +128,20 @@ pub use global_rng::*;
 
 /// A random number generator.
 #[derive(Debug, PartialEq, Eq)]
-pub struct Rng(u64);
+pub struct Rng {
+    x: u64,
+    y: u64,
+    c: u64,
+}
 
 impl Clone for Rng {
     /// Clones the generator by creating a new generator with the same seed.
     fn clone(&self) -> Rng {
-        Rng::with_seed(self.0)
+        Rng {
+            x: self.x,
+            y: self.y,
+            c: self.c,
+        }
     }
 }
 
@@ -147,15 +155,16 @@ impl Rng {
     /// Generates a random `u64`.
     #[inline]
     fn gen_u64(&mut self) -> u64 {
-        // Constants for WyRand taken from: https://github.com/wangyi-fudan/wyhash/blob/master/wyhash.h#L151
-        // Updated for the final v4.2 implementation with improved constants for better entropy output.
-        const WY_CONST_0: u64 = 0x2d35_8dcc_aa6c_78a5;
-        const WY_CONST_1: u64 = 0x8bb8_4b93_962e_acc9;
+        const MWC_A2: u64 = 0xffa04e67b3c95d86;
+        let result = self.y;
 
-        let s = self.0.wrapping_add(WY_CONST_0);
-        self.0 = s;
-        let t = u128::from(s) * u128::from(s ^ WY_CONST_1);
-        (t as u64) ^ (t >> 64) as u64
+        let t = (MWC_A2 as u128)
+            .wrapping_mul(self.x as u128)
+            .wrapping_add(self.c as u128);
+        self.x = self.y;
+        self.y = t as u64;
+        self.c = (t >> 64) as u64;
+        result
     }
 
     /// Generates a random `u128`.
@@ -290,7 +299,11 @@ impl Rng {
     #[inline]
     #[must_use = "this creates a new instance of `Rng`; if you want to initialize the thread-local generator, use `fastrand::seed()` instead"]
     pub const fn with_seed(seed: u64) -> Self {
-        Rng(seed)
+        Rng {
+            x: seed,
+            y: seed,
+            c: 1,
+        }
     }
 
     /// Clones the generator by deterministically deriving a new generator based on the initial
@@ -539,13 +552,8 @@ impl Rng {
     /// Initializes this generator with the given seed.
     #[inline]
     pub fn seed(&mut self, seed: u64) {
-        self.0 = seed;
-    }
-
-    /// Gives back **current** seed that is being held by this generator.
-    #[inline]
-    pub fn get_seed(&self) -> u64 {
-        self.0
+        self.c = 1;
+        self.x = seed;
     }
 
     /// Choose an item from an iterator at random.

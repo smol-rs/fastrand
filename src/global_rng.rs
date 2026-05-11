@@ -28,14 +28,14 @@ impl Rng {
 }
 
 std::thread_local! {
-    static RNG: Cell<Rng> = Cell::new(Rng(random_seed().unwrap_or(DEFAULT_RNG_SEED)));
+    static RNG: Cell<Rng> = Cell::new(Rng::with_seed(random_seed().unwrap_or(DEFAULT_RNG_SEED)));
 }
 
 /// Run an operation with the current thread-local generator.
 #[inline]
 fn with_rng<R>(f: impl FnOnce(&mut Rng) -> R) -> R {
     RNG.with(|rng| {
-        let current = rng.replace(Rng(0));
+        let current = rng.replace(Rng::with_seed(0));
 
         let mut restore = RestoreOnDrop { rng, current };
 
@@ -47,7 +47,7 @@ fn with_rng<R>(f: impl FnOnce(&mut Rng) -> R) -> R {
 #[inline]
 fn try_with_rng<R>(f: impl FnOnce(&mut Rng) -> R) -> Result<R, std::thread::AccessError> {
     RNG.try_with(|rng| {
-        let current = rng.replace(Rng(0));
+        let current = rng.replace(Rng::with_seed(0));
 
         let mut restore = RestoreOnDrop { rng, current };
 
@@ -63,7 +63,7 @@ struct RestoreOnDrop<'a> {
 
 impl Drop for RestoreOnDrop<'_> {
     fn drop(&mut self) {
-        self.rng.set(Rng(self.current.0));
+        self.rng.set(self.current.clone());
     }
 }
 
@@ -71,12 +71,6 @@ impl Drop for RestoreOnDrop<'_> {
 #[inline]
 pub fn seed(seed: u64) {
     with_rng(|r| r.seed(seed));
-}
-
-/// Gives back **current** seed that is being held by the thread-local generator.
-#[inline]
-pub fn get_seed() -> u64 {
-    with_rng(|r| r.get_seed())
 }
 
 /// Generates a random `bool`.
