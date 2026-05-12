@@ -1,0 +1,2 @@
+[build]
+rustflags = ["-C", "target-cpu=native", "-A", "non-camel-case-types", "-A", "non-upper-case-globals", "-A", "non_snake_case"]
