@@ -554,6 +554,7 @@ impl Rng {
     pub fn seed(&mut self, seed: u64) {
         self.c = 1;
         self.x = seed;
+        self.y = seed;
     }
 
     /// Choose an item from an iterator at random.
