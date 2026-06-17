@@ -297,23 +297,27 @@ macro_rules! rng_integer {
     };
 }
 
-impl Rng {
-    const fn remix_seed(seed: u64) -> u64 {
-        seed.wrapping_mul(0xd1342543de82ef95)
-            .wrapping_add(0x9e3779b97f4a7c15)
-    }
+/// The [SplitMix](https://dl.acm.org/doi/10.1145/2714064.2660195)
+/// finalizing mixer (used only for seeding).
+const fn split_mix64(z: u64) -> u64 {
+    let z = (z ^ (z >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);
+    let z = (z ^ (z >> 27)).wrapping_mul(0x94d049bb133111eb);
+    z ^ (z >> 31)
+}
 
+impl Rng {
     /// Creates a new random number generator with the initial seed.
     #[inline]
     #[must_use = "this creates a new instance of `Rng`; if you want to initialize the thread-local generator, use `fastrand::seed()` instead"]
     pub const fn with_seed(seed: u64) -> Self {
-        // Remixes minimally the seed since the first output is y
-        let remixed_seed = Self::remix_seed(seed);
-        Rng {
-            x: remixed_seed,
-            y: remixed_seed,
-            c: 1,
-        }
+        // Advance the state by the SplitMix increment before mixing, and take
+        // two successive outputs.
+        const INCREMENT: u64 = 0x9e3779b97f4a7c15;
+        let s = seed.wrapping_add(INCREMENT);
+        let x = split_mix64(s);
+        let s = s.wrapping_add(INCREMENT);
+        let y = split_mix64(s);
+        Rng { x, y, c: 1 }
     }
 
     /// Clones the generator by deterministically deriving a new generator based on the initial
@@ -562,11 +566,7 @@ impl Rng {
     /// Initializes this generator with the given seed.
     #[inline]
     pub fn seed(&mut self, seed: u64) {
-        // Remix minimially the seed since the first output is y
-        let remixed_seed = Self::remix_seed(seed);
-        self.c = 1;
-        self.x = remixed_seed;
-        self.y = remixed_seed;
+        *self = Self::with_seed(seed);
     }
 
     /// Choose an item from an iterator at random.
