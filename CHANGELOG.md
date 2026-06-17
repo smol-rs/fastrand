@@ -1,3 +1,8 @@
+# Version 2.4.2
+
+- Replaced WyRand with a Marsaglia multiply-with-carry generator with 192 bits
+  of state.
+
 # Version 2.4.1
 
 - Fix build failure with `js` feature. (#125)

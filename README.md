@@ -1,18 +1,15 @@
 # fastrand
 
-[![Build](https://github.com/smol-rs/fastrand/actions/workflows/ci.yml/badge.svg)](
-https://github.com/smol-rs/fastrand/actions)
-[![License](https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue.svg)](
-https://github.com/smol-rs/fastrand)
-[![Cargo](https://img.shields.io/crates/v/fastrand.svg)](
-https://crates.io/crates/fastrand)
-[![Documentation](https://docs.rs/fastrand/badge.svg)](
-https://docs.rs/fastrand)
+[![Build](https://github.com/smol-rs/fastrand/actions/workflows/ci.yml/badge.svg)](https://github.com/smol-rs/fastrand/actions)
+[![License](https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue.svg)](https://github.com/smol-rs/fastrand)
+[![Cargo](https://img.shields.io/crates/v/fastrand.svg)](https://crates.io/crates/fastrand)
+[![Documentation](https://docs.rs/fastrand/badge.svg)](https://docs.rs/fastrand)
 
 A simple and fast random number generator.
 
-The implementation uses [Wyrand](https://github.com/wangyi-fudan/wyhash), a simple and fast
-generator but **not** cryptographically secure.
+The implementation uses a [Marsaglia multiply-with-carry generator with 192 bits
+of state](https://prng.di.unimi.it/MWC192.c), a simple and fast generator but
+**not** cryptographically secure.
 
 ## Examples
 
@@ -98,8 +95,8 @@ This crate aims to expose a core set of useful randomness primitives. For more n
 
 Licensed under either of
 
- * Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or https://www.apache.org/licenses/LICENSE-2.0)
- * MIT license ([LICENSE-MIT](LICENSE-MIT) or https://opensource.org/license/mit)
+- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or https://www.apache.org/licenses/LICENSE-2.0)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or https://opensource.org/license/mit)
 
 at your option.
 

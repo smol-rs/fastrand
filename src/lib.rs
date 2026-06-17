@@ -1,7 +1,9 @@
 //! A simple and fast random number generator.
 //!
-//! The implementation uses [Wyrand](https://github.com/wangyi-fudan/wyhash), a simple and fast
-//! generator but **not** cryptographically secure.
+//! The implementation uses [Marsaglia multiply-with-carry generator with 192
+//! bits of state](https://prng.di.unimi.it/MWC192.c), a simple and fast
+//! generator but **not** cryptographically secure. The generator has a period
+//! of ≈2¹⁹¹.
 //!
 //! # Examples
 //!
@@ -155,6 +157,7 @@ impl Rng {
     /// Generates a random `u64`.
     #[inline]
     pub fn gen_u64(&mut self) -> u64 {
+        // Constant from https://prng.di.unimi.it/MWC192.c
         const MWC_A2: u64 = 0xffa04e67b3c95d86;
         let result = self.y;
 
@@ -295,13 +298,20 @@ macro_rules! rng_integer {
 }
 
 impl Rng {
+    const fn remix_seed(seed: u64) -> u64 {
+        seed.wrapping_mul(0xd1342543de82ef95)
+            .wrapping_add(0x9e3779b97f4a7c15)
+    }
+
     /// Creates a new random number generator with the initial seed.
     #[inline]
     #[must_use = "this creates a new instance of `Rng`; if you want to initialize the thread-local generator, use `fastrand::seed()` instead"]
     pub const fn with_seed(seed: u64) -> Self {
+        // Remixes minimally the seed since the first output is y
+        let remixed_seed = Self::remix_seed(seed);
         Rng {
-            x: seed,
-            y: seed,
+            x: remixed_seed,
+            y: remixed_seed,
             c: 1,
         }
     }
@@ -393,7 +403,7 @@ impl Rng {
         // There is still some remaining bias in the int-to-float conversion, because
         // nonzero numbers <=2^(-64) are never generated, even though they are
         // expressible in f32. However, at this point the bias in int-to-float conversion
-        // is no larger than the bias in the underlying WyRand generator: since it only
+        // is no larger than the bias in the underlying generator: since it only
         // has a 64-bit state, it necessarily already have biases of at least 2^(-64)
         // probability.
         //
@@ -552,9 +562,11 @@ impl Rng {
     /// Initializes this generator with the given seed.
     #[inline]
     pub fn seed(&mut self, seed: u64) {
+        // Remix minimially the seed since the first output is y
+        let remixed_seed = Self::remix_seed(seed);
         self.c = 1;
-        self.x = seed;
-        self.y = seed;
+        self.x = remixed_seed;
+        self.y = remixed_seed;
     }
 
     /// Choose an item from an iterator at random.
@@ -592,7 +604,7 @@ impl Rng {
     #[inline]
     pub fn fill(&mut self, slice: &mut [u8]) {
         // We fill the slice by chunks of 8 bytes, or one block of
-        // WyRand output per new state.
+        // output per new state.
         let mut chunks = slice.chunks_exact_mut(core::mem::size_of::<u64>());
         for chunk in chunks.by_ref() {
             let n = self.gen_u64().to_ne_bytes();
