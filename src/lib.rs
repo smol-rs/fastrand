@@ -137,7 +137,7 @@ pub struct Rng {
 }
 
 impl Clone for Rng {
-    /// Clones the generator by creating a new generator with the same seed.
+    /// Clones the generator, copying its current state.
     fn clone(&self) -> Rng {
         Rng {
             x: self.x,
@@ -156,7 +156,7 @@ impl Rng {
 
     /// Generates a random `u64`.
     #[inline]
-    pub fn gen_u64(&mut self) -> u64 {
+    fn gen_u64(&mut self) -> u64 {
         // Constant from https://prng.di.unimi.it/MWC192.c
         const MWC_A2: u64 = 0xffa04e67b3c95d86;
         let result = self.y;

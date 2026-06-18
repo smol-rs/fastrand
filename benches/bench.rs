@@ -91,7 +91,7 @@ fn u64_fastrand(b: &mut Bencher) {
     let mut rng = fastrand::Rng::new();
     b.iter(|| {
         for _ in 0..10_000 {
-            black_box(rng.gen_u64());
+            black_box(rng.u64(..));
         }
     })
 }
