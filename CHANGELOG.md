@@ -1,3 +1,9 @@
+# Version 3.0.0
+
+- Replaced WyRand with a Marsaglia multiply-with-carry generator with 192 bits
+  of state. (#129)
+- Removed `get_seed` and `Rng::get_seed`. (#129)
+
 # Version 2.4.1
 
 - Fix build failure with `js` feature. (#125)

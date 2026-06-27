@@ -10,7 +10,7 @@ rust-version = "1.63"
 description = "A simple and fast random number generator"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/smol-rs/fastrand"
-keywords = ["simple", "fast", "rand", "random", "wyrand"]
+keywords = ["simple", "fast", "rand", "random", "MWC"]
 categories = ["algorithms"]
 exclude = ["/.*"]
 

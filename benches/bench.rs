@@ -2,6 +2,8 @@
 
 extern crate test;
 
+use std::hint::black_box;
+
 use rand::prelude::*;
 use test::Bencher;
 use wyhash::WyRng;
@@ -71,6 +73,26 @@ fn u32_fastrand(b: &mut Bencher) {
             sum = sum.wrapping_add(rng.u32(..));
         }
         sum
+    })
+}
+
+#[bench]
+fn u64_wyhash(b: &mut Bencher) {
+    let mut rng = WyRng::from_rng(&mut rand::rng());
+    b.iter(|| {
+        for _ in 0..10_000 {
+            black_box(rng.random::<u64>());
+        }
+    })
+}
+
+#[bench]
+fn u64_fastrand(b: &mut Bencher) {
+    let mut rng = fastrand::Rng::new();
+    b.iter(|| {
+        for _ in 0..10_000 {
+            black_box(rng.u64(..));
+        }
     })
 }
 

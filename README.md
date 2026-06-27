@@ -11,8 +11,9 @@ https://docs.rs/fastrand)
 
 A simple and fast random number generator.
 
-The implementation uses [Wyrand](https://github.com/wangyi-fudan/wyhash), a simple and fast
-generator but **not** cryptographically secure.
+The implementation uses a [Marsaglia multiply-with-carry generator with 192 bits
+of state](https://prng.di.unimi.it/MWC192.c), a simple and fast generator but
+**not** cryptographically secure.
 
 ## Examples
 
