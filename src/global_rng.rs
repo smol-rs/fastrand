@@ -35,7 +35,7 @@ std::thread_local! {
 #[inline]
 fn with_rng<R>(f: impl FnOnce(&mut Rng) -> R) -> R {
     RNG.with(|rng| {
-        let current = rng.replace(Rng::with_seed(0));
+        let current = rng.replace(Rng { c: 1, x: 0, y: 0 });
 
         let mut restore = RestoreOnDrop { rng, current };
 
@@ -47,7 +47,7 @@ fn with_rng<R>(f: impl FnOnce(&mut Rng) -> R) -> R {
 #[inline]
 fn try_with_rng<R>(f: impl FnOnce(&mut Rng) -> R) -> Result<R, std::thread::AccessError> {
     RNG.try_with(|rng| {
-        let current = rng.replace(Rng::with_seed(0));
+        let current = rng.replace(Rng { c: 1, x: 0, y: 0 });
 
         let mut restore = RestoreOnDrop { rng, current };
 
