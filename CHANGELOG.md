@@ -1,3 +1,7 @@
+# Version 2.5.0
+
+- Update `getrandom` to 0.4. (#131)
+
 # Version 2.4.1
 
 - Fix build failure with `js` feature. (#125)
